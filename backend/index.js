@@ -46,7 +46,8 @@ app.use(cors({
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    preflightContinue: false
 }));
 
 // Handle preflight requests explicitly
@@ -63,6 +64,13 @@ app.get('/', (request, response) =>{
 // Debug middleware to log all requests
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.url} - Origin: ${req.get('Origin')}`);
+    
+    // Clean up double slashes in URLs
+    if (req.url.includes('//')) {
+        req.url = req.url.replace(/\/+/g, '/');
+        console.log(`Cleaned URL to: ${req.url}`);
+    }
+    
     next();
 });
 
