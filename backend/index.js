@@ -94,10 +94,10 @@ app.use('/admin', (req, res, next) => {
     express.json()(req, res, next);
 });
 
-app.use('/admin', emailRoute);
-app.use('/admin', publicationRoute);
-app.use('/admin', resultRoute);
-app.use('/admin', CourseRoute);
-app.use('/admin', noticeRoute);
-app.use('/admin', studentRoute);
-app.use('/api/gallery', galleryRoute);
+app.use('admin', emailRoute);
+app.use('admin', publicationRoute);
+app.use('admin', resultRoute);
+app.use('admin', CourseRoute);
+app.use('admin', noticeRoute);
+app.use('admin', studentRoute);
+app.use('api/gallery', galleryRoute);
