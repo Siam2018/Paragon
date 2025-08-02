@@ -3,7 +3,7 @@ const router = express.Router();
 import Auth from "../Middlewares/Auth.js";
 import StudentController from "../Controllers/StudentController.js";
 import AuthValidation from "../Middlewares/AuthValidation.js";
-import FileUpload from "../Middlewares/FileUpload.js";
+import dynamicUpload from "../Middlewares/FileUpload.js";
 
 // Public routes
 router.post("/Student/register", AuthValidation.studentRegisterValidation, StudentController.createStudent);
@@ -13,7 +13,7 @@ router.post("/Student/login", AuthValidation.studentSigninValidation, StudentCon
 router.get("/Student/public", StudentController.getAllStudents);
 
 // Student authenticated routes
-router.put("/Student/photo/:id", Auth, FileUpload('Students'), StudentController.updateStudentPhoto);
+router.put("/Student/photo/:id", Auth, dynamicUpload('Students'), StudentController.updateStudentPhoto);
 router.put("/Student/password/:id", Auth, StudentController.updateStudentPassword);
 
 // Admin protected routes

@@ -11,6 +11,7 @@ import emailRoute from "./routes/emailRoute.js";
 import galleryRoute from "./routes/galleryRoute.js";
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
 config();
@@ -24,6 +25,34 @@ const PORT = process.env.PORT;
 const mongoDBURL = process.env.mongoDBURL;
 const HTTPURLFrontend = process.env.HTTPURLFrontend;
 const app = express();
+
+// Create necessary upload directories
+const createUploadDirectories = () => {
+    const uploadDirs = [
+        'uploads',
+        'uploads/gallery',
+        'uploads/courses',
+        'uploads/notices',
+        'uploads/publications',
+        'uploads/results',
+        'uploads/students'
+    ];
+
+    uploadDirs.forEach(dir => {
+        const dirPath = path.join(__dirname, dir);
+        if (!fs.existsSync(dirPath)) {
+            try {
+                fs.mkdirSync(dirPath, { recursive: true });
+                console.log(`Created directory: ${dir}`);
+            } catch (error) {
+                console.error(`Failed to create directory ${dir}:`, error);
+            }
+        }
+    });
+};
+
+// Create upload directories before starting the server
+createUploadDirectories();
 
 mongoose
     .connect(mongoDBURL)
@@ -48,13 +77,6 @@ app.use(cors({
 // Serve static files from backend uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Legacy support for existing files in frontend public directory
-app.use('/Student', express.static(path.join(__dirname, '../frontend/public/Student')));
-app.use('/Course', express.static(path.join(__dirname, '../frontend/public/Course')));
-app.use('/Notice', express.static(path.join(__dirname, '../frontend/public/Notice')));
-app.use('/Publication', express.static(path.join(__dirname, '../frontend/public/Publication')));
-app.use('/Result', express.static(path.join(__dirname, '../frontend/public/Result')));
-
 app.get('/', (request, response) =>{
     console.log(request);
     return response.status(234).send("Welcome to Paragon");
@@ -78,6 +100,4 @@ app.use('/admin', resultRoute);
 app.use('/admin', CourseRoute);
 app.use('/admin', noticeRoute);
 app.use('/admin', studentRoute);
-
-// Gallery routes (public access for viewing, admin for management)
 app.use('/api/gallery', galleryRoute);

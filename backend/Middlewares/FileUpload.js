@@ -9,7 +9,7 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // Use req.uploadSubfolder to determine subfolder, default to 'uploads'
     const subfolder = req.uploadSubfolder || 'uploads';
-    const uploadPath = path.resolve(__dirname, `../uploads/${subfolder.toLowerCase()}`);
+    const uploadPath = `uploads/${subfolder.toLowerCase()}`;
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
@@ -26,7 +26,7 @@ const dynamicUpload = (subfolder) => {
     req.uploadSubfolder = subfolder;
     
     // Determine file field name and filter based on subfolder
-    let fieldName = 'Image'; // default field name for all image uploads
+    let fieldName = 'Image'; // default field name for image uploads
     let fileFilter = (req, file, cb) => {
       if (file.mimetype.startsWith('image/')) {
         cb(null, true);
@@ -35,8 +35,13 @@ const dynamicUpload = (subfolder) => {
       }
     };
     
-    // For Notice subfolder, accept PDF files with 'PDF' field name
-    if (subfolder === 'Notice') {
+    // For gallery subfolder, use 'image' (lowercase) field name
+    if (subfolder.toLowerCase() === 'gallery') {
+      fieldName = 'image';
+    }
+    
+    // For Notice/notices subfolder, accept PDF files with 'PDF' field name
+    if (subfolder.toLowerCase() === 'notice' || subfolder.toLowerCase() === 'notices') {
       fieldName = 'PDF';
       fileFilter = (req, file, cb) => {
         if (file.mimetype === 'application/pdf') {
