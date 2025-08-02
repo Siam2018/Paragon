@@ -5,6 +5,13 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
 
+// Helper function to join URLs without double slashes
+const joinURL = (base, path) => {
+  const cleanBase = base?.replace(/\/+$/, '') || '';
+  const cleanPath = path?.replace(/^\/+/, '') || '';
+  return `${cleanBase}/${cleanPath}`;
+};
+
 function Navbar() {
   const [count, setCount] = useState(0)
   const [isOpen, setIsOpen] = useState(false);

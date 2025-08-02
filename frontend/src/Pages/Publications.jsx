@@ -23,12 +23,19 @@ const Publications = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedPublication, setSelectedPublication] = useState(null);
 
+  // Simple URL joining function to avoid double slashes
+  const joinURL = (base, path) => {
+    const cleanBase = base.replace(/\/+$/, '');
+    const cleanPath = path.replace(/^\/+/, '');
+    return `${cleanBase}/${cleanPath}`;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       const token = localStorage.getItem('jwtToken');
       try {
-        const res = await fetch(`${BACKEND_URL}/admin/Publication`, {
+        const res = await fetch(joinURL(BACKEND_URL, '/admin/Publication'), {
           headers: {
             'Content-Type': 'application/json',
             ...(token ? { 'Authorization': `Bearer ${token}` } : {})
@@ -70,7 +77,7 @@ const Publications = () => {
       if (imageFile) form.append('Image', imageFile);
       if (editId) {
         // Update existing
-        res = await fetch(`${BACKEND_URL}/admin/Publication/${editId}`, {
+        res = await fetch(joinURL(BACKEND_URL, `/admin/Publication/${editId}`), {
           method: 'PUT',
           headers: { Authorization: `Bearer ${token}` },
           body: form,
@@ -80,7 +87,7 @@ const Publications = () => {
         setPublications(publications.map(pub => (pub._id === editId ? updatedPub : pub)));
       } else {
         // Create new
-        res = await fetch(`${BACKEND_URL}/admin/Publication`, {
+        res = await fetch(joinURL(BACKEND_URL, '/admin/Publication'), {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: form,
@@ -106,7 +113,7 @@ const Publications = () => {
     setFormError(null);
     const token = localStorage.getItem('jwtToken');
     try {
-      const res = await fetch(`${BACKEND_URL}/admin/Publication/${editId}`, {
+      const res = await fetch(joinURL(BACKEND_URL, `/admin/Publication/${editId}`), {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -131,7 +138,7 @@ const Publications = () => {
       // Create a File object from the existing image to populate the file input
       if (pub.ImageURL) {
         try {
-          const response = await fetch(`${BACKEND_URL}/uploads/Publications/${pub.ImageURL.replace(/^.*[\\/]/, '')}`);
+          const response = await fetch(joinURL(BACKEND_URL, `/uploads/Publications/${pub.ImageURL.replace(/^.*[\\/]/, '')}`));
           const blob = await response.blob();
           const file = new File([blob], pub.ImageURL.replace(/^.*[\\/]/, ''), { type: blob.type });
           setImageFile(file);
@@ -300,10 +307,10 @@ const Publications = () => {
                 >
                   <div className='aspect-[3/4] overflow-hidden'>
                     <img
-                      src={pub.ImageURL ? `${BACKEND_URL}/uploads/publications/${pub.ImageURL.replace(/^.*[\\/]/, '')}` : `${BACKEND_URL}/uploads/publications/placeholder.png`}
+                      src={pub.ImageURL ? joinURL(BACKEND_URL, `/uploads/publications/${pub.ImageURL.replace(/^.*[\\/]/, '')}`) : joinURL(BACKEND_URL, '/uploads/publications/placeholder.png')}
                       alt={pub.Title || 'Publication Image'}
                       className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'
-                      onError={e => { e.target.onerror = null; e.target.src = `${BACKEND_URL}/uploads/publications/placeholder.png`; }}
+                      onError={e => { e.target.onerror = null; e.target.src = joinURL(BACKEND_URL, '/uploads/publications/placeholder.png'); }}
                     />
                   </div>
                   <div className='p-3 sm:p-4'>
@@ -337,10 +344,10 @@ const Publications = () => {
               {selectedPublication.ImageURL && (
                 <div className='mb-4 sm:mb-6'>
                   <img
-                    src={`${BACKEND_URL}/uploads/publications/${selectedPublication.ImageURL.replace(/^.*[\\/]/, '')}`}
+                    src={joinURL(BACKEND_URL, `/uploads/publications/${selectedPublication.ImageURL.replace(/^.*[\\/]/, '')}`)}
                     alt={selectedPublication.Title}
                     className='w-full max-w-md mx-auto rounded-lg shadow-md'
-                    onError={e => { e.target.onerror = null; e.target.src = `${BACKEND_URL}/uploads/publications/placeholder.png`; }}
+                    onError={e => { e.target.onerror = null; e.target.src = joinURL(BACKEND_URL, '/uploads/publications/placeholder.png'); }}
                   />
                 </div>
               )}

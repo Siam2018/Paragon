@@ -8,6 +8,13 @@ import Footer from '../Components/Footer.jsx';
 
 const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
 
+// Helper function to join URLs without double slashes
+const joinURL = (base, path) => {
+  const cleanBase = base?.replace(/\/+$/, '') || '';
+  const cleanPath = path?.replace(/^\/+/, '') || '';
+  return `${cleanBase}/${cleanPath}`;
+};
+
 const Courses = () => {
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
@@ -66,7 +73,7 @@ const Courses = () => {
       setLoading(true);
       const token = localStorage.getItem('jwtToken');
       try {
-        const res = await fetch(`${BACKEND_URL}/admin/Course`, {
+        const res = await fetch(joinURL(BACKEND_URL, 'admin/Course'), {
           headers: {
             'Content-Type': 'application/json',
             ...(token ? { 'Authorization': `Bearer ${token}` } : {})
@@ -114,7 +121,7 @@ const Courses = () => {
       if (imageFile) form.append('Image', imageFile);
       if (editId) {
         // Update existing
-        res = await fetch(`${BACKEND_URL}/admin/Course/${editId}`, {
+        res = await fetch(joinURL(BACKEND_URL, `admin/Course/${editId}`), {
           method: 'PUT',
           headers: { Authorization: `Bearer ${token}` },
           body: form,
@@ -124,7 +131,7 @@ const Courses = () => {
         setCourses(courses.map(c => (c._id === editId ? updatedCourse : c)));
       } else {
         // Create new
-        res = await fetch(`${BACKEND_URL}/admin/Course`, {
+        res = await fetch(joinURL(BACKEND_URL, 'admin/Course'), {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: form,
@@ -161,7 +168,7 @@ const Courses = () => {
     setFormError(null);
     const token = localStorage.getItem('jwtToken');
     try {
-      const res = await fetch(`${BACKEND_URL}/admin/Course/${editId}`, {
+      const res = await fetch(joinURL(BACKEND_URL, `admin/Course/${editId}`), {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

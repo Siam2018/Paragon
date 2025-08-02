@@ -8,6 +8,13 @@ import Footer from '../Components/Footer.jsx';
 
 const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
 
+// Helper function to join URLs without double slashes
+const joinURL = (base, path) => {
+  const cleanBase = base?.replace(/\/+$/, '') || '';
+  const cleanPath = path?.replace(/^\/+/, '') || '';
+  return `${cleanBase}/${cleanPath}`;
+};
+
 const Results = () => {
   const navigate = useNavigate();
   const [results, setResults] = useState([]);
@@ -26,7 +33,7 @@ const Results = () => {
       setLoading(true);
       const token = localStorage.getItem('jwtToken');
       try {
-        const res = await fetch(`${BACKEND_URL}/admin/Result`, {
+        const res = await fetch(joinURL(BACKEND_URL, 'admin/Result'), {
           headers: {
             'Content-Type': 'application/json',
             ...(token ? { 'Authorization': `Bearer ${token}` } : {})
@@ -65,7 +72,7 @@ const Results = () => {
       if (imageFile) form.append('Image', imageFile);
       if (editId) {
         // Update existing
-        res = await fetch(`${BACKEND_URL}/admin/Result/${editId}`, {
+        res = await fetch(joinURL(BACKEND_URL, `admin/Result/${editId}`), {
           method: 'PUT',
           headers: { Authorization: `Bearer ${token}` },
           body: form,
@@ -75,7 +82,7 @@ const Results = () => {
         setResults(results.map(r => (r._id === editId ? updatedResult : r)));
       } else {
         // Create new
-        res = await fetch(`${BACKEND_URL}/admin/Result`, {
+        res = await fetch(joinURL(BACKEND_URL, 'admin/Result'), {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: form,
@@ -101,7 +108,7 @@ const Results = () => {
     setFormError(null);
     const token = localStorage.getItem('jwtToken');
     try {
-      const res = await fetch(`${BACKEND_URL}/admin/Result/${editId}`, {
+      const res = await fetch(joinURL(BACKEND_URL, `admin/Result/${editId}`), {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

@@ -42,11 +42,11 @@ if (mongoDBURL) {
 
 // Enable CORS for all routes
 app.use(cors({
-    origin: [HTTPURLFrontend, 'https://paragon-4urr.vercel.app'], // Add your frontend URLs
+    origin: ['https://paragon-4urr.vercel.app', 'http://localhost:5173', 'http://localhost:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    optionsSuccessStatus: 200 // For legacy browser support
+    optionsSuccessStatus: 200
 }));
 
 // Handle preflight requests explicitly
@@ -58,6 +58,12 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get('/', (request, response) =>{
     console.log(request);
     return response.status(234).send("Welcome to Paragon");
+});
+
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url} - Origin: ${req.get('Origin')}`);
+    next();
 });
 
 // Apply express.json() to auth routes that need JSON parsing

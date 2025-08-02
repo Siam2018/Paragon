@@ -2,6 +2,13 @@ import React, { useEffect, useState } from 'react';
 
 const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
 
+// Helper function to join URLs without double slashes
+const joinURL = (base, path) => {
+  const cleanBase = base?.replace(/\/+$/, '') || '';
+  const cleanPath = path?.replace(/^\/+/, '') || '';
+  return `${cleanBase}/${cleanPath}`;
+};
+
 const SuccessStoriesSection = () => {
   const [topResults, setTopResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,7 +16,7 @@ const SuccessStoriesSection = () => {
   useEffect(() => {
     const fetchTopResults = async () => {
       try {
-        const response = await fetch(`${BACKEND_URL}/admin/Result`);
+        const response = await fetch(joinURL(BACKEND_URL, 'admin/Result'));
         if (response.ok) {
           const allResults = await response.json();
           // Sort by marks in ascending order and take top 8
@@ -91,16 +98,16 @@ const SuccessStoriesSection = () => {
               <div key={`${result._id || index}-${Math.floor(index / topResults.length)}`} className="flex-shrink-0">
                 {result.ImageURL ? (
                   <img
-                    src={`${BACKEND_URL}/uploads/Results/${result.ImageURL}`}
+                    src={joinURL(BACKEND_URL, `uploads/Results/${result.ImageURL}`)}
                     alt={`Result ${index + 1}`}
                     className="w-60 h-60 sm:w-72 sm:h-72 lg:w-80 lg:h-80 object-cover rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer"
                     onError={(e) => {
                       e.target.onerror = null;
                       // Try general uploads folder if Results folder fails
                       if (e.target.src.includes('/uploads/Results/')) {
-                        e.target.src = `${BACKEND_URL}/uploads/${result.ImageURL}`;
+                        e.target.src = joinURL(BACKEND_URL, `uploads/${result.ImageURL}`);
                       } else {
-                        e.target.src = `${BACKEND_URL}/uploads/placeholder.png`;
+                        e.target.src = joinURL(BACKEND_URL, 'uploads/placeholder.png');
                       }
                     }}
                   />
