@@ -11,7 +11,6 @@ import emailRoute from "./routes/emailRoute.js";
 import galleryRoute from "./routes/galleryRoute.js";
 import cors from 'cors';
 import path from 'path';
-import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
 config();
@@ -21,58 +20,37 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load environment variables from .env file
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 const mongoDBURL = process.env.mongoDBURL;
 const HTTPURLFrontend = process.env.HTTPURLFrontend;
 const app = express();
 
-// Create necessary upload directories
-const createUploadDirectories = () => {
-    const uploadDirs = [
-        'uploads',
-        'uploads/gallery',
-        'uploads/courses',
-        'uploads/notices',
-        'uploads/publications',
-        'uploads/results',
-        'uploads/students'
-    ];
-
-    uploadDirs.forEach(dir => {
-        const dirPath = path.join(__dirname, dir);
-        if (!fs.existsSync(dirPath)) {
-            try {
-                fs.mkdirSync(dirPath, { recursive: true });
-                console.log(`Created directory: ${dir}`);
-            } catch (error) {
-                console.error(`Failed to create directory ${dir}:`, error);
-            }
-        }
-    });
-};
-
-// Create upload directories before starting the server
-createUploadDirectories();
-
-mongoose
-    .connect(mongoDBURL)
-    .then(()=>{
-        app.listen(PORT, () => {
-        console.log('App is listening to port: ' + PORT);
+// Connect to MongoDB (non-blocking for serverless)
+if (mongoDBURL) {
+    mongoose
+        .connect(mongoDBURL)
+        .then(() => {
+            console.log('Connected to MongoDB');
+        })
+        .catch((error) => {
+            console.log('MongoDB connection error:', error);
         });
-    })
-    .catch((error)=>{
-        console.log(error);
-    });
+} else {
+    console.warn('MongoDB URL not provided');
+}
 
 
 // Enable CORS for all routes
 app.use(cors({
-    origin: HTTPURLFrontend, // Replace with your frontend URL
+    origin: [HTTPURLFrontend, 'https://paragon-4urr.vercel.app'], // Add your frontend URLs
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    optionsSuccessStatus: 200 // For legacy browser support
 }));
+
+// Handle preflight requests explicitly
+app.options('*', cors());
 
 // Serve static files from backend uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -101,3 +79,13 @@ app.use('/admin', CourseRoute);
 app.use('/admin', noticeRoute);
 app.use('/admin', studentRoute);
 app.use('/api/gallery', galleryRoute);
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log('App is listening to port: ' + PORT);
+    });
+}
+
+// Export for Vercel
+export default app;

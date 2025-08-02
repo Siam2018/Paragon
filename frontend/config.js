@@ -1,1 +1,0 @@
-export const HTTPURL = 'http://localhost:5555'
