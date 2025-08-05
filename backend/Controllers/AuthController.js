@@ -40,7 +40,7 @@ const adminSignin = async (request, response) => {
             return response.status(401).send({ message: "Invalid email or password." });
         }
         // Generate token
-        const token = jwt.sign({ id: admin._id, Email: admin.Email }, process.env.JWT_SECRET, { expiresIn: "12h" });
+        const token = jwt.sign({ id: admin._id, Email: admin.Email }, process.env.JWT_SECRET, { expiresIn: "2h" });
         return response.status(200).send({ token , admin: { FullName: admin.FullName, Email: admin.Email } });
     } catch (error) {
         console.log(error.message);

@@ -17,7 +17,7 @@ const deleteFile = (filename) => {
 // Get all gallery images
 export const getAllGalleryImages = async (req, res) => {
   try {
-    const images = await Gallery.find({ isActive: true }).sort({ order: 1, uploadDate: -1 });
+    const images = await Gallery.find({ isActive: true }).sort({ createdAt: -1 });
     res.status(200).json({ success: true, count: images.length, data: images });
   } catch (error) {
     console.error('Error fetching gallery images:', error);
@@ -49,10 +49,7 @@ export const addGalleryImage = async (req, res) => {
 
     const { isActive } = req.body;
     const galleryImage = new Gallery({
-      title: `Gallery Image ${Date.now()}`,
-      description: '',
       imageURL: req.file.filename,
-      tags: [],
       isActive: isActive === 'true' || isActive === true
     });
 

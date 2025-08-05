@@ -187,7 +187,7 @@ function Navbar() {
                     onClick={handleAdminHomeClick}
                     className="text-black text-sm sm:text-base font-medium px-4 sm:px-5 py-2 sm:py-2.5 border-2 border-white rounded-lg bg-green-300 hover:bg-green-400 transition-colors w-full max-w-[200px] sm:max-w-[220px] active:bg-green-500"
                   >
-                    Admin Home
+                    Home
                   </button>
                   <button 
                     onClick={handleLogout}
