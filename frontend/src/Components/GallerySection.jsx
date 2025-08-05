@@ -14,7 +14,7 @@ const GallerySection = () => {
   const fetchRandomImages = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${BACKEND_URL}/api/gallery/random?limit=6`);
+      const response = await fetch(`${BACKEND_URL}/gallery/random?limit=6`);
       const data = await response.json();
       
       if (data.success) {
@@ -68,7 +68,7 @@ const GallerySection = () => {
                   alt={`Gallery image ${index + 1}`}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 group-hover:scale-110" 
                   onError={(e) => {
-                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlICR7aW5kZXggKyAxfTwvdGV4dD48L3N2Zz4=';
+                    e.target.src = `https://via.placeholder.com/400x300?text=Image+${index + 1}`;
                   }}
                 />
               </div>
@@ -78,7 +78,7 @@ const GallerySection = () => {
             placeholderImages.map((placeholder, index) => (
               <div key={index} className="bg-gray-200 h-48 sm:h-56 lg:h-64 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
                 <img 
-                  src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkdhbGxlcnkgSW1hZ2U8L3RleHQ+PC9zdmc+"
+                  src={`https://via.placeholder.com/400x300?text=${encodeURIComponent(placeholder.title)}`} 
                   alt={placeholder.alt} 
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" 
                 />

@@ -1,3 +1,4 @@
+
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -22,54 +23,89 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Enable CORS for all origins
+// Environment variables
+const PORT = process.env.PORT || 3000;
+const mongoDBURL = process.env.mongoDBURL;
+const HTTPURLFrontend = process.env.HTTPURLFrontend;
+
+// CORS configuration for Vercel
 app.use(cors({
-    origin: '*',
+    origin: [
+        HTTPURLFrontend,
+        'https://paragon-frontend.vercel.app',
+        'http://localhost:5173',
+        'http://localhost:3000'
+    ],
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['*'],
-    credentials: true
+    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept']
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Handle preflight requests
+app.options('*', cors());
 
-// Serve static files from uploads folder
+// Middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// MongoDB connection
+// MongoDB connection with better error handling for Vercel
 const connectDB = async () => {
     try {
-        if (process.env.MongoURL) {
-            const conn = await mongoose.connect(process.env.MongoURL);
+        if (mongoDBURL) {
+            const conn = await mongoose.connect(mongoDBURL, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+            });
             console.log(`MongoDB Connected: ${conn.connection.host}`);
+        } else {
+            console.log('MongoDB URL not provided');
         }
     } catch (error) {
         console.error('MongoDB connection error:', error);
+        // Don't exit process in serverless environment
+        if (process.env.NODE_ENV !== 'production') {
+            process.exit(1);
+        }
     }
 };
 
+// Connect to database
 connectDB();
 
-// Test endpoint
+// Root endpoint
 app.get('/', (req, res) => {
     res.json({ 
-        message: "Paragon API - Full Version",
+        message: "Paragon API - Production Version",
         status: "working",
         cors: "enabled",
         mongodb: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development'
     });
 });
 
-// Use your existing route files
+// API Routes - Using your existing route structure
 app.use('/auth', authRouter);
 app.use('/admin', courseRoute);
 app.use('/admin', resultRoute);
 app.use('/admin', publicationRoute);
 app.use('/admin', noticeRoute);
+app.use('/admin', studentRoute);
+app.use('/admin', emailRoute);
 app.use('/api/gallery', galleryRoute);
-app.use('/api/email', emailRoute);
-app.use('/api', studentRoute);
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    });
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -85,11 +121,22 @@ app.use((err, req, res, next) => {
 app.use('*', (req, res) => {
     res.status(404).json({
         success: false,
-        message: 'Route not found'
+        message: `Route ${req.originalUrl} not found`,
+        availableRoutes: [
+            'GET /',
+            'GET /health',
+            'POST /auth/Admin/Register',
+            'POST /auth/Admin/Signin',
+            'GET /admin/Course',
+            'GET /admin/Result',
+            'GET /admin/Publication',
+            'GET /admin/Notice',
+            'GET /api/gallery',
+            'POST /api/Student/register',
+            'POST /api/Student/login'
+        ]
     });
 });
-
-const PORT = process.env.PORT || 3000;
 
 // For Vercel serverless functions
 export default app;
@@ -98,5 +145,7 @@ export default app;
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
+        console.log(`Frontend URL: ${HTTPURLFrontend}`);
+        console.log(`MongoDB: ${mongoDBURL ? 'Connected' : 'Not configured'}`);
     });
 }
