@@ -14,57 +14,52 @@ import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
 config();
 
-// Get __dirname equivalent for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Load environment variables from .env file
-const PORT = process.env.PORT || 3000;
-const mongoDBURL = process.env.mongoDBURL;
-const HTTPURLFrontend = process.env.HTTPURLFrontend;
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Configure CORS for both development and production
-const allowedOrigins = [
-    'http://localhost:5173',
-    'http://localhost:5174', 
-    'https://paragon-frontend.vercel.app',
-    'https://paragon-frontend.vercel.app/', // with trailing slash
-    HTTPURLFrontend // from .env file
-].filter(Boolean); // Remove any undefined values
-
-console.log('Allowed CORS origins:', allowedOrigins);
-
-// Enable CORS for all routes - UPDATED VERSION
+// CORS - Allow all origins for now
 app.use(cors({
-    origin: '*', // Allow all origins explicitly
+    origin: '*',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept']
+    allowedHeaders: ['*']
 }));
 
-// Global JSON parsing middleware
+// Middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Serve static files from backend uploads directory
-if (process.env.VERCEL) {
-    // For Vercel deployment, serve from /tmp (note: files won't persist)
-    app.use('/uploads', express.static('/tmp'));
-} else {
-    app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-}
-
-app.get('/', (request, response) => {
-    return response.status(200).json({
-        message: "Welcome to Paragon API",
+// Test endpoint
+app.get('/', (req, res) => {
+    res.json({ 
+        message: "Paragon API v3.0", 
         timestamp: new Date().toISOString(),
-        cors: "All origins allowed",
-        version: "v2.0"
+        cors: "enabled" 
     });
 });
 
-// Routes
+// Connect to MongoDB only if not already connected
+let isConnected = false;
+
+const connectDB = async () => {
+    if (isConnected) return;
+    
+    try {
+        const mongoDBURL = process.env.mongoDBURL;
+        if (!mongoDBURL) {
+            throw new Error('MongoDB URL not found');
+        }
+        
+        await mongoose.connect(mongoDBURL);
+        isConnected = true;
+        console.log('MongoDB connected');
+    } catch (error) {
+        console.error('MongoDB connection error:', error);
+        throw error;
+    }
+};
+
+// Routes - only mount after DB connection
 app.use('/auth', authRoute);
 app.use('/admin', emailRoute);
 app.use('/admin', publicationRoute);
@@ -74,19 +69,26 @@ app.use('/admin', noticeRoute);
 app.use('/admin', studentRoute);
 app.use('/api/gallery', galleryRoute);
 
-// Connect to MongoDB and start server
-console.log('MongoDB URL:', mongoDBURL ? 'Present' : 'Missing');
-mongoose
-    .connect(mongoDBURL)
-    .then(() => {
-        console.log('Connected to MongoDB');
-        app.listen(PORT, () => {
-            console.log('App is listening to port: ' + PORT);
-        });
-    })
-    .catch((error) => {
-        console.log('MongoDB connection error:', error);
+// For Vercel
+if (process.env.VERCEL) {
+    // Connect to DB on each request in serverless
+    app.use(async (req, res, next) => {
+        try {
+            await connectDB();
+            next();
+        } catch (error) {
+            res.status(500).json({ error: 'Database connection failed' });
+        }
     });
+}
 
-// Export for Vercel
+// For local development
+if (!process.env.VERCEL) {
+    connectDB().then(() => {
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    }).catch(console.error);
+}
+
 export default app;
