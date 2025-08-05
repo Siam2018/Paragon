@@ -12,7 +12,6 @@ const app = express();
 // Environment variables
 const PORT = process.env.PORT || 3000;
 const mongoDBURL = process.env.mongoDBURL;
-const HTTPURLFrontend = process.env.HTTPURLFrontend;
 
 // CORS configuration for Vercel
 app.use(cors({
@@ -47,95 +46,91 @@ connectDB();
 // Root endpoint
 app.get('/', (req, res) => {
     res.json({ 
-        message: "Paragon API - Production Version",
-        status: "working",
+        message: "Paragon API - Working Version",
+        status: "working", 
         cors: "enabled",
         mongodb: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
         timestamp: new Date().toISOString(),
-        routes: [
-            'GET /',
-            'GET /admin/Course',
-            'GET /admin/Result', 
-            'GET /api/gallery/random'
-        ]
+        version: "minimal-safe"
     });
 });
 
-// Import controllers directly to avoid route file issues
-const createCourseEndpoints = async () => {
+// Create course endpoints with direct model import
+app.get('/admin/Course', async (req, res) => {
     try {
-        const { default: CourseController } = await import('./Controllers/CourseController.js');
-        
-        app.get('/admin/Course', async (req, res) => {
-            try {
-                await CourseController.getAllCourses(req, res);
-            } catch (error) {
-                res.status(500).json({ error: error.message });
-            }
-        });
-        
-        app.get('/admin/Course/:id', async (req, res) => {
-            try {
-                await CourseController.getCourseById(req, res);
-            } catch (error) {
-                res.status(500).json({ error: error.message });
-            }
-        });
-        
-        console.log('Course endpoints created');
+        // Import Course model directly
+        const { Course } = await import('./models/coursemodel.js');
+        const courses = await Course.find();
+        res.status(200).json(courses);
     } catch (error) {
-        console.error('Error creating course endpoints:', error);
+        console.error('Course error:', error);
+        res.status(500).json({ 
+            error: 'Failed to fetch courses',
+            message: error.message 
+        });
     }
-};
+});
 
-const createResultEndpoints = async () => {
+// Create result endpoints with direct model import
+app.get('/admin/Result', async (req, res) => {
     try {
-        const { default: ResultController } = await import('./Controllers/ResultController.js');
-        
-        app.get('/admin/Result', async (req, res) => {
-            try {
-                await ResultController.getAllResults(req, res);
-            } catch (error) {
-                res.status(500).json({ error: error.message });
-            }
-        });
-        
-        console.log('Result endpoints created');
+        // Import Result model directly
+        const { Result } = await import('./models/resultmodel.js');
+        const results = await Result.find();
+        res.status(200).json(results);
     } catch (error) {
-        console.error('Error creating result endpoints:', error);
+        console.error('Result error:', error);
+        res.status(500).json({ 
+            error: 'Failed to fetch results',
+            message: error.message 
+        });
     }
-};
+});
 
-const createGalleryEndpoints = async () => {
+// Create gallery endpoints with direct model import
+app.get('/api/gallery/random', async (req, res) => {
     try {
-        const GalleryController = await import('./Controllers/GalleryController.js');
-        
-        app.get('/api/gallery/random', async (req, res) => {
-            try {
-                await GalleryController.getRandomGalleryImages(req, res);
-            } catch (error) {
-                res.status(500).json({ error: error.message });
-            }
+        // Import Gallery model directly
+        const { Gallery } = await import('./models/gallerymodel.js');
+        const limit = parseInt(req.query.limit) || 6;
+        const images = await Gallery.aggregate([
+            { $match: { isActive: true } },
+            { $sample: { size: limit } }
+        ]);
+        res.status(200).json({ 
+            success: true, 
+            count: images.length, 
+            data: images 
         });
-        
-        app.get('/api/gallery', async (req, res) => {
-            try {
-                await GalleryController.getAllGalleryImages(req, res);
-            } catch (error) {
-                res.status(500).json({ error: error.message });
-            }
-        });
-        
-        console.log('Gallery endpoints created');
     } catch (error) {
-        console.error('Error creating gallery endpoints:', error);
+        console.error('Gallery random error:', error);
+        res.status(500).json({ 
+            success: false,
+            error: 'Failed to fetch random gallery images',
+            message: error.message 
+        });
     }
-};
+});
 
-// Create endpoints
-createCourseEndpoints();
-createResultEndpoints();
-createGalleryEndpoints();
+app.get('/api/gallery', async (req, res) => {
+    try {
+        // Import Gallery model directly
+        const { Gallery } = await import('./models/gallerymodel.js');
+        const images = await Gallery.find({ isActive: true }).sort({ createdAt: -1 });
+        res.status(200).json({ 
+            success: true, 
+            count: images.length, 
+            data: images 
+        });
+    } catch (error) {
+        console.error('Gallery error:', error);
+        res.status(500).json({ 
+            success: false,
+            error: 'Failed to fetch gallery images',
+            message: error.message 
+        });
+    }
+});
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -148,7 +143,7 @@ app.get('/health', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error('Error:', err);
+    console.error('Global error:', err);
     res.status(500).json({
         success: false,
         message: 'Internal server error',
@@ -160,7 +155,15 @@ app.use((err, req, res, next) => {
 app.use('*', (req, res) => {
     res.status(404).json({
         success: false,
-        message: `Route ${req.originalUrl} not found`
+        message: `Route ${req.originalUrl} not found`,
+        availableRoutes: [
+            'GET /',
+            'GET /health',
+            'GET /admin/Course',
+            'GET /admin/Result',
+            'GET /api/gallery',
+            'GET /api/gallery/random'
+        ]
     });
 });
 
