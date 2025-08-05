@@ -2,11 +2,25 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Import your existing routes
+import authRouter from './routes/AuthRouter.js';
+import courseRoute from './routes/courseRoute.js';
+import emailRoute from './routes/emailRoute.js';
+import galleryRoute from './routes/galleryRoute.js';
+import noticeRoute from './routes/noticeRoute.js';
+import publicationRoute from './routes/publicationRoute.js';
+import resultRoute from './routes/resultRoute.js';
+import studentRoute from './routes/studentRoute.js';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Enable CORS for all origins
 app.use(cors({
@@ -18,6 +32,9 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from uploads folder
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MongoDB connection
 const connectDB = async () => {
@@ -44,23 +61,15 @@ app.get('/', (req, res) => {
     });
 });
 
-// Import and use controllers directly instead of routes to avoid path-to-regexp issues
-import CourseController from './Controllers/CourseController.js';
-import GalleryController from './Controllers/GalleryController.js';
-import ResultController from './Controllers/ResultController.js';
-
-// Course endpoints
-app.get('/admin/Course', CourseController.getAllCourses);
-app.get('/admin/Course/:id', CourseController.getCourseById);
-
-// Gallery endpoints
-app.get('/api/gallery', GalleryController.getAllGalleryImages);
-app.get('/api/gallery/random', GalleryController.getRandomGalleryImages);
-app.get('/api/gallery/:id', GalleryController.getGalleryImageById);
-
-// Results endpoints
-app.get('/admin/Result', ResultController.getAllResults);
-app.get('/admin/Result/:id', ResultController.getResultById);
+// Use your existing route files
+app.use('/auth', authRouter);
+app.use('/admin', courseRoute);
+app.use('/admin', resultRoute);
+app.use('/admin', publicationRoute);
+app.use('/admin', noticeRoute);
+app.use('/api/gallery', galleryRoute);
+app.use('/api/email', emailRoute);
+app.use('/api', studentRoute);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
