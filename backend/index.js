@@ -77,6 +77,7 @@ app.use('/admin', studentRoute);
 app.use('/api/gallery', galleryRoute);
 
 // Connect to MongoDB and start server
+console.log('MongoDB URL:', mongoDBURL ? 'Present' : 'Missing');
 mongoose
     .connect(mongoDBURL)
     .then(() => {
