@@ -2,16 +2,11 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
-
-// Environment variables
-const PORT = process.env.PORT || 3000;
-const mongoDBURL = process.env.mongoDBURL;
 
 // CORS configuration for Vercel
 app.use(cors({
@@ -28,108 +23,94 @@ app.options('*', cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// MongoDB connection
-const connectDB = async () => {
-    try {
-        if (mongoDBURL) {
-            await mongoose.connect(mongoDBURL);
-            console.log('MongoDB Connected');
-        }
-    } catch (error) {
-        console.error('MongoDB connection error:', error);
-    }
-};
-
-// Connect to database
-connectDB();
-
 // Root endpoint
 app.get('/', (req, res) => {
     res.json({ 
-        message: "Paragon API - Working Version",
+        message: "Paragon API - Ultra Minimal Version",
         status: "working", 
         cors: "enabled",
-        mongodb: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
         timestamp: new Date().toISOString(),
-        version: "minimal-safe"
+        version: "ultra-minimal-no-db"
     });
 });
 
-// Create course endpoints with direct model import
-app.get('/admin/Course', async (req, res) => {
-    try {
-        // Import Course model directly
-        const { Course } = await import('./models/coursemodel.js');
-        const courses = await Course.find();
-        res.status(200).json(courses);
-    } catch (error) {
-        console.error('Course error:', error);
-        res.status(500).json({ 
-            error: 'Failed to fetch courses',
-            message: error.message 
-        });
-    }
+// Hardcoded endpoints to test basic functionality
+app.get('/admin/Course', (req, res) => {
+    res.status(200).json([
+        {
+            _id: "test1",
+            Title: "খ ইউনিট (ব্যবসায় শিক্ষা)",
+            Description: "ব্যবসায় শিক্ষা বিভাগের জন্য প্রস্তুতি",
+            Price: 3000,
+            ImageURL: "course1.jpg"
+        },
+        {
+            _id: "test2", 
+            Title: "গ ইউনিট (মানবিক বিভাগ)",
+            Description: "মানবিক বিভাগের জন্য প্রস্তুতি",
+            Price: 2500,
+            ImageURL: "course2.jpg"
+        }
+    ]);
 });
 
-// Create result endpoints with direct model import
-app.get('/admin/Result', async (req, res) => {
-    try {
-        // Import Result model directly
-        const { Result } = await import('./models/resultmodel.js');
-        const results = await Result.find();
-        res.status(200).json(results);
-    } catch (error) {
-        console.error('Result error:', error);
-        res.status(500).json({ 
-            error: 'Failed to fetch results',
-            message: error.message 
-        });
-    }
+app.get('/admin/Result', (req, res) => {
+    res.status(200).json([
+        {
+            _id: "result1",
+            Title: "২০২৪ সালের ফলাফল",
+            Description: "এই বছরের পরীক্ষার ফলাফল",
+            ImageURL: "result1.jpg"
+        }
+    ]);
 });
 
-// Create gallery endpoints with direct model import
-app.get('/api/gallery/random', async (req, res) => {
-    try {
-        // Import Gallery model directly
-        const { Gallery } = await import('./models/gallerymodel.js');
-        const limit = parseInt(req.query.limit) || 6;
-        const images = await Gallery.aggregate([
-            { $match: { isActive: true } },
-            { $sample: { size: limit } }
-        ]);
-        res.status(200).json({ 
-            success: true, 
-            count: images.length, 
-            data: images 
-        });
-    } catch (error) {
-        console.error('Gallery random error:', error);
-        res.status(500).json({ 
-            success: false,
-            error: 'Failed to fetch random gallery images',
-            message: error.message 
-        });
-    }
+app.get('/api/gallery/random', (req, res) => {
+    res.status(200).json({ 
+        success: true, 
+        count: 2, 
+        data: [
+            {
+                _id: "gallery1",
+                title: "ক্যাম্পাস ছবি ১",
+                imageURL: "gallery1.jpg",
+                isActive: true
+            },
+            {
+                _id: "gallery2",
+                title: "ক্যাম্পাস ছবি ২", 
+                imageURL: "gallery2.jpg",
+                isActive: true
+            }
+        ]
+    });
 });
 
-app.get('/api/gallery', async (req, res) => {
-    try {
-        // Import Gallery model directly
-        const { Gallery } = await import('./models/gallerymodel.js');
-        const images = await Gallery.find({ isActive: true }).sort({ createdAt: -1 });
-        res.status(200).json({ 
-            success: true, 
-            count: images.length, 
-            data: images 
-        });
-    } catch (error) {
-        console.error('Gallery error:', error);
-        res.status(500).json({ 
-            success: false,
-            error: 'Failed to fetch gallery images',
-            message: error.message 
-        });
-    }
+app.get('/api/gallery', (req, res) => {
+    res.status(200).json({ 
+        success: true, 
+        count: 3, 
+        data: [
+            {
+                _id: "gallery1",
+                title: "ক্যাম্পাস ছবি ১",
+                imageURL: "gallery1.jpg",
+                isActive: true
+            },
+            {
+                _id: "gallery2",
+                title: "ক্যাম্পাস ছবি ২",
+                imageURL: "gallery2.jpg", 
+                isActive: true
+            },
+            {
+                _id: "gallery3",
+                title: "ক্যাম্পাস ছবি ৩",
+                imageURL: "gallery3.jpg",
+                isActive: true
+            }
+        ]
+    });
 });
 
 // Health check endpoint
@@ -137,7 +118,7 @@ app.get('/health', (req, res) => {
     res.status(200).json({
         status: 'healthy',
         timestamp: new Date().toISOString(),
-        mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+        message: 'API is working without database dependencies'
     });
 });
 
