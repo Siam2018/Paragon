@@ -71,7 +71,7 @@ app.use('/auth', authRoute);
 app.use('/admin', emailRoute);
 app.use('/admin', publicationRoute);
 app.use('/admin', resultRoute);
-app.use('/admin', CourseRoute);
+app.use('admin', CourseRoute);
 app.use('/admin', noticeRoute);
 app.use('/admin', studentRoute);
 app.use('/api/gallery', galleryRoute);
