@@ -29,19 +29,27 @@ const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:5174', 
     'https://paragon-frontend.vercel.app',
+    'https://paragon-frontend.vercel.app/', // with trailing slash
     HTTPURLFrontend // from .env file
 ].filter(Boolean); // Remove any undefined values
+
+console.log('Allowed CORS origins:', allowedOrigins);
 
 // Enable CORS for all routes
 app.use(cors({
     origin: function (origin, callback) {
+        console.log('CORS request from origin:', origin);
+        console.log('Allowed origins:', allowedOrigins);
+        
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
         
         // Check if the origin is allowed
         if (allowedOrigins.includes(origin)) {
+            console.log('Origin allowed:', origin);
             return callback(null, true);
         } else {
+            console.log('Origin BLOCKED:', origin);
             return callback(new Error('Not allowed by CORS'));
         }
     },
