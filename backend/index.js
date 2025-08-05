@@ -35,12 +35,12 @@ const allowedOrigins = [
 
 console.log('Allowed CORS origins:', allowedOrigins);
 
-// Enable CORS for all routes
+// Enable CORS for all routes - UPDATED VERSION
 app.use(cors({
-    origin: true, // Temporarily allow all origins for debugging
+    origin: '*', // Allow all origins explicitly
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept']
 }));
 
 // Global JSON parsing middleware
@@ -56,7 +56,12 @@ if (process.env.VERCEL) {
 }
 
 app.get('/', (request, response) => {
-    return response.status(200).send("Welcome to Paragon");
+    return response.status(200).json({
+        message: "Welcome to Paragon API",
+        timestamp: new Date().toISOString(),
+        cors: "All origins allowed",
+        version: "v2.0"
+    });
 });
 
 // Routes
