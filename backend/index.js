@@ -1,58 +1,94 @@
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Import routes
+import courseRoute from './routes/courseRoute.js';
+import galleryRoute from './routes/galleryRoute.js';
+import resultRoute from './routes/resultRoute.js';
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Enable CORS for all origins
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['*']
+    allowedHeaders: ['*'],
+    credentials: true
 }));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// MongoDB connection
+const connectDB = async () => {
+    try {
+        const conn = await mongoose.connect(process.env.MongoURL);
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
+    } catch (error) {
+        console.error('MongoDB connection error:', error);
+        // Don't exit process in serverless environment
+        if (process.env.NODE_ENV !== 'production') {
+            console.log('Continuing without MongoDB connection for now...');
+        }
+    }
+};
+
+connectDB();
 
 // Test endpoint
 app.get('/', (req, res) => {
     res.json({ 
-        message: "Paragon API Emergency Version",
+        message: "Paragon API - Full Version",
         status: "working",
         cors: "enabled",
+        mongodb: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
         timestamp: new Date().toISOString()
     });
 });
 
-// Emergency course endpoint
-app.get('/admin/Course', (req, res) => {
-    res.json([{
-        _id: "test",
-        Title: "Test Course",
-        Description: "Emergency test data",
-        Price: 0
-    }]);
-});
+// API Routes - adding one by one to identify the problematic route
+app.use('/admin', courseRoute);
+app.use('/api/gallery', galleryRoute);
+app.use('/admin', resultRoute);
 
-// Emergency gallery endpoint
-app.get('/api/gallery/random', (req, res) => {
-    res.json({
-        success: true,
-        count: 1,
-        data: [{
-            _id: "test",
-            title: "Test Gallery",
-            imageURL: "test.jpg",
-            isActive: true
-        }]
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
     });
 });
 
-// Emergency results endpoint
-app.get('/admin/Result', (req, res) => {
-    res.json([{
-        _id: "test",
-        title: "Test Result",
-        description: "Emergency test data"
-    }]);
+// Handle 404
+app.use('*', (req, res) => {
+    res.status(404).json({
+        success: false,
+        message: 'Route not found'
+    });
 });
 
+const PORT = process.env.PORT || 3000;
+
+// For Vercel serverless functions
 export default app;
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
