@@ -8,6 +8,12 @@ const __dirname = path.dirname(__filename);
 
 // Create necessary upload directories
 const createUploadDirectories = () => {
+    // Skip directory creation on Vercel (serverless environment)
+    if (process.env.VERCEL) {
+        console.log('Running on Vercel - skipping directory creation');
+        return;
+    }
+    
     const uploadDirs = [
         'uploads',
         'uploads/gallery',
@@ -36,10 +42,16 @@ createUploadDirectories();
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // Use req.uploadSubfolder to determine subfolder, default to 'uploads'
-    const subfolder = req.uploadSubfolder || 'uploads';
-    const uploadPath = `uploads/${subfolder.toLowerCase()}`;
-    cb(null, uploadPath);
+    // For Vercel deployment, use /tmp directory
+    if (process.env.VERCEL) {
+      const subfolder = req.uploadSubfolder || 'uploads';
+      cb(null, '/tmp');
+    } else {
+      // Use req.uploadSubfolder to determine subfolder, default to 'uploads'
+      const subfolder = req.uploadSubfolder || 'uploads';
+      const uploadPath = `uploads/${subfolder.toLowerCase()}`;
+      cb(null, uploadPath);
+    }
   },
   filename: function (req, file, cb) {
     // Add timestamp to prevent filename conflicts

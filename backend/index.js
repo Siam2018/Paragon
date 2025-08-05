@@ -37,7 +37,12 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Serve static files from backend uploads directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+if (process.env.VERCEL) {
+    // For Vercel deployment, serve from /tmp (note: files won't persist)
+    app.use('/uploads', express.static('/tmp'));
+} else {
+    app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+}
 
 app.get('/', (request, response) => {
     return response.status(200).send("Welcome to Paragon");
