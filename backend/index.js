@@ -1,171 +1,76 @@
 
-import express from 'express';
+import express from "express"
+import mongoose from 'mongoose'
+import authRoute from "./routes/AuthRouter.js";
+import publicationRoute from "./routes/publicationRoute.js";
+import resultRoute from "./routes/resultRoute.js";
+import CourseRoute from "./routes/courseRoute.js";
+import noticeRoute from "./routes/noticeRoute.js";
+import studentRoute from "./routes/studentRoute.js";
+import emailRoute from "./routes/emailRoute.js";
+import galleryRoute from "./routes/galleryRoute.js";
+import dynamicUpload from "./Middlewares/FileUpload.js"; // This will create directories on import
 import cors from 'cors';
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { config } from 'dotenv';
+config();
 
-// Load environment variables
-dotenv.config();
+// Get __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+// Load environment variables from .env file
+const PORT = process.env.PORT;
+const mongoDBURL = process.env.mongoDBURL;
+const HTTPURLFrontend = process.env.HTTPURLFrontend;
 const app = express();
 
-// Environment variables
-const PORT = process.env.PORT || 3000;
-const mongoDBURL = process.env.mongoDBURL;
+mongoose
+    .connect(mongoDBURL)
+    .then(()=>{
+        app.listen(PORT, () => {
+        console.log('App is listening to port: ' + PORT);
+        });
+    })
+    .catch((error)=>{
+        console.log(error);
+    });
 
-// CORS configuration for Vercel
+// Enable CORS for all routes
 app.use(cors({
-    origin: '*',
+    origin: HTTPURLFrontend, // Replace with your frontend URL
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['*']
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Handle preflight requests
-app.options('*', cors());
+// Serve static files from backend uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.get('/', (request, response) =>{
+    console.log(request);
+    return response.status(234).send("Welcome to Paragon");
+});
 
-// MongoDB connection
-const connectDB = async () => {
-    try {
-        if (mongoDBURL) {
-            await mongoose.connect(mongoDBURL);
-            console.log('MongoDB Connected');
-        }
-    } catch (error) {
-        console.error('MongoDB connection error:', error);
+// Apply express.json() to auth routes that need JSON parsing
+app.use('/auth', express.json(), authRoute);
+
+// Apply express.json() to admin routes except those with file uploads
+app.use('/admin', (req, res, next) => {
+    // Skip express.json() for file upload routes
+    if ((req.path.includes('/Result') || req.path.includes('/Publication') || req.path.includes('/Course') || req.path.includes('/Notice') || req.path.includes('/Student/photo') || req.path.includes('/gallery')) && (req.method === 'POST' || req.method === 'PUT')) {
+        return next();
     }
-};
-
-// Connect to database
-connectDB();
-
-// Root endpoint
-app.get('/', (req, res) => {
-    res.json({ 
-        message: "Paragon API - Express 4.x Stable Version",
-        status: "working", 
-        cors: "enabled",
-        mongodb: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
-        timestamp: new Date().toISOString(),
-        version: "express-4x-stable"
-    });
+    express.json()(req, res, next);
 });
 
-// Course endpoints with direct model import
-app.get('/admin/Course', async (req, res) => {
-    try {
-        // Import Course model directly
-        const { Course } = await import('./models/coursemodel.js');
-        const courses = await Course.find();
-        res.status(200).json(courses);
-    } catch (error) {
-        console.error('Course error:', error);
-        res.status(500).json({ 
-            error: 'Failed to fetch courses',
-            message: error.message 
-        });
-    }
-});
+app.use('/admin', emailRoute);
+app.use('/admin', publicationRoute);
+app.use('/admin', resultRoute);
+app.use('/admin', CourseRoute);
+app.use('/admin', noticeRoute);
+app.use('/admin', studentRoute);
 
-// Result endpoints with direct model import
-app.get('/admin/Result', async (req, res) => {
-    try {
-        // Import Result model directly
-        const { Result } = await import('./models/resultmodel.js');
-        const results = await Result.find();
-        res.status(200).json(results);
-    } catch (error) {
-        console.error('Result error:', error);
-        res.status(500).json({ 
-            error: 'Failed to fetch results',
-            message: error.message 
-        });
-    }
-});
-
-// Gallery endpoints with direct model import
-app.get('/api/gallery/random', async (req, res) => {
-    try {
-        // Import Gallery model directly
-        const { Gallery } = await import('./models/gallerymodel.js');
-        const limit = parseInt(req.query.limit) || 6;
-        const images = await Gallery.aggregate([
-            { $match: { isActive: true } },
-            { $sample: { size: limit } }
-        ]);
-        res.status(200).json({ 
-            success: true, 
-            count: images.length, 
-            data: images 
-        });
-    } catch (error) {
-        console.error('Gallery random error:', error);
-        res.status(500).json({ 
-            success: false,
-            error: 'Failed to fetch random gallery images',
-            message: error.message 
-        });
-    }
-});
-
-app.get('/api/gallery', async (req, res) => {
-    try {
-        // Import Gallery model directly
-        const { Gallery } = await import('./models/gallerymodel.js');
-        const images = await Gallery.find({ isActive: true }).sort({ createdAt: -1 });
-        res.status(200).json({ 
-            success: true, 
-            count: images.length, 
-            data: images 
-        });
-    } catch (error) {
-        console.error('Gallery error:', error);
-        res.status(500).json({ 
-            success: false,
-            error: 'Failed to fetch gallery images',
-            message: error.message 
-        });
-    }
-});
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-    res.status(200).json({
-        status: 'healthy',
-        timestamp: new Date().toISOString(),
-        message: 'API is working without database dependencies'
-    });
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error('Global error:', err);
-    res.status(500).json({
-        success: false,
-        message: 'Internal server error',
-        error: err.message
-    });
-});
-
-// Handle 404
-app.use('*', (req, res) => {
-    res.status(404).json({
-        success: false,
-        message: `Route ${req.originalUrl} not found`,
-        availableRoutes: [
-            'GET /',
-            'GET /health',
-            'GET /admin/Course',
-            'GET /admin/Result',
-            'GET /api/gallery',
-            'GET /api/gallery/random'
-        ]
-    });
-});
-
-// For Vercel serverless functions
-export default app;
+// Gallery routes (public access for viewing, admin for management)
+app.use('/gallery', galleryRoute);
