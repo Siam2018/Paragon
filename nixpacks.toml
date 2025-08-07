@@ -1,0 +1,19 @@
+# Nixpacks configuration for Railway - Backend only
+[phases.setup]
+nixPkgs = ["nodejs-18_x"]
+
+[phases.install]
+cmds = [
+  "cp backend/package*.json ./",
+  "npm install --production"
+]
+
+[phases.build]
+cmds = [
+  "cp -r backend/* ./",
+  "mkdir -p uploads/courses uploads/gallery uploads/notices uploads/Publications uploads/Results uploads/students",
+  "chmod -R 755 uploads"
+]
+
+[start]
+cmd = "node index.js"
