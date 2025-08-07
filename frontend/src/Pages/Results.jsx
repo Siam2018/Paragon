@@ -226,10 +226,13 @@ const Results = () => {
               >
                 <div className='aspect-[4/3] overflow-hidden'>
                   <img
-                    src={result.ImageURL ? `${BACKEND_URL}/uploads/results/${result.ImageURL.replace(/^.*[\\/]/, '')}` : `${BACKEND_URL}/uploads/results/placeholder.png`}
+                    src={result.ImageURL ? `${BACKEND_URL}/uploads/results/${result.ImageURL.replace(/^.*[\\/]/, '')}` : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI0MCIgdmlld0JveD0iMCAwIDQwMCAyNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjEyMCIgcj0iNDAiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2ZyB4PSIxODAiIHk9IjEwMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRkZGRkZGIiB2aWV3Qm94PSIwIDAgMjQgMjQiPgo8cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik0xMiAyQTEwIDEwIDAgMCAwIDIgMTJhMTAgMTAgMCAwIDAgMTAgMTBBMTAgMTAgMCAwIDAgMTIgMlptMCAxOGE4IDggMCAxIDEgOC04QTggOCAwIDAgMSAxMiAyMFptMS4zLTEyYTEuMyAxLjMgMCAwIDAtMi42IDBjMCAuNy41IDEuMyAxLjMgMS4zaDFWMTZhMSAxIDAgMCAwIDItMXYtNGMwLS43LS42LTEuMy0xLjMtMS4zWm0wIDEwYTEuMyAxLjMgMCAxIDAgMC0yLjZBMS4zIDEuMyAwIDAgMCAxMy4zIDE4WiIvPgo8L3N2Zz4KPC9zdmc+'}
                     alt={result.Title || 'Result Image'}
                     className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
-                    onError={e => { e.target.onerror = null; e.target.src = `${BACKEND_URL}/uploads/results/placeholder.png`; }}
+                    onError={e => { 
+                      e.target.onerror = null; 
+                      e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI0MCIgdmlld0JveD0iMCAwIDQwMCAyNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjEyMCIgcj0iNDAiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2ZyB4PSIxODAiIHk9IjEwMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRkZGRkZGIiB2aWV3Qm94PSIwIDAgMjQgMjQiPgo8cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik0xMiAyQTEwIDEwIDAgMCAwIDIgMTJhMTAgMTAgMCAwIDAgMTAgMTBBMTAgMTAgMCAwIDAgMTIgMlptMCAxOGE4IDggMCAxIDEgOC04QTggOCAwIDAgMSAxMiAyMFptMS4zLTEyYTEuMyAxLjMgMCAwIDAtMi42IDBjMCAuNy41IDEuMyAxLjMgMS4zaDFWMTZhMSAxIDAgMCAwIDItMXYtNGMwLS43LS42LTEuMy0xLjMtMS4zWm0wIDEwYTEuMyAxLjMgMCAxIDAgMC0yLjZBMS4zIDEuMyAwIDAgMCAxMy4zIDE4WiIvPgo8L3N2Zz4KPC9zdmc+'; 
+                    }}
                   />
                 </div>
                 <div className='p-4 flex-1 flex flex-col'>

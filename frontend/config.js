@@ -1,1 +1,0 @@
-export const HTTPURL = import.meta.env.VITE_HTTPURLBackend || 'http://localhost:3000'

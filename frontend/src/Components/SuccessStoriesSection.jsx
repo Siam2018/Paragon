@@ -100,7 +100,7 @@ const SuccessStoriesSection = () => {
                       if (e.target.src.includes('/uploads/Results/')) {
                         e.target.src = `${BACKEND_URL}/uploads/${result.ImageURL}`;
                       } else {
-                        e.target.src = `${BACKEND_URL}/uploads/placeholder.png`;
+                        e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjIwMCIgcj0iNDAiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2ZyB4PSIxODAiIHk9IjE4MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRkZGRkZGIiB2aWV3Qm94PSIwIDAgMjQgMjQiPgo8cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik0xMiAyQTEwIDEwIDAgMCAwIDIgMTJhMTAgMTAgMCAwIDAgMTAgMTBBMTAgMTAgMCAwIDAgMTIgMlptMCAxOGE4IDggMCAxIDEgOC04QTggOCAwIDAgMSAxMiAyMFptMS4zLTEyYTEuMyAxLjMgMCAwIDAtMi42IDBjMCAuNy41IDEuMyAxLjMgMS4zaDFWMTZhMSAxIDAgMCAwIDItMXYtNGMwLS43LS42LTEuMy0xLjMtMS4zWm0wIDEwYTEuMyAxLjMgMCAxIDAgMC0yLjZBMS4zIDEuMyAwIDAgMCAxMy4zIDE4WiIvPgo8L3N2Zz4KPC9zdmc+';
                       }
                     }}
                   />

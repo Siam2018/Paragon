@@ -494,10 +494,13 @@ const Courses = () => {
                   {/* Course Image */}
                   <div className='relative'>
                     <img
-                      src={course.ImageURL ? `${BACKEND_URL}/uploads/courses/${course.ImageURL.replace(/^.*[\\/]/, '')}` : `${BACKEND_URL}/uploads/courses/placeholder.png`}
+                      src={course.ImageURL ? `${BACKEND_URL}/uploads/courses/${course.ImageURL.replace(/^.*[\\/]/, '')}` : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI0MCIgdmlld0JveD0iMCAwIDQwMCAyNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xODUgMTIwSDIxNVYxMzBIMTg1VjEyMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2ZyBmaWxsPSIjOUNBM0FGIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2Utd2lkdGg9IjIiIGNsYXNzPSJ3LTYgaC02Ij4KICA8cGF0aCBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGQ9Im0yMS4xMjEgMy4yMTMgMi44MjggMi44MjdMNiAyNC4wM2wtNC4wMy0uMDM5IDIuODI4LTIuODI4TDIxLjEyMSAzLjIxM1oiLz4KICA8cGF0aCBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGQ9Im0xOSAxMS0xNSAxNSIvPgo8L3N2Zz4KPC9zdmc+'}
                       alt={course.Title || 'Course Image'}
                       className='w-full h-40 sm:h-48 object-cover'
-                      onError={e => { e.target.onerror = null; e.target.src = `${BACKEND_URL}/uploads/courses/placeholder.png`; }}
+                      onError={e => { 
+                        e.target.onerror = null; 
+                        e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI0MCIgdmlld0JveD0iMCAwIDQwMCAyNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjEyMCIgcj0iNDAiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2ZyB4PSIxODAiIHk9IjEwMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRkZGRkZGIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2Utd2lkdGg9IjIiPgo8cGF0aCBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGQ9Im0yLjI1IDMuNzVhLjc1Ljc1IDAgMCAwLS43NS43NXYxNi41YS43NS43NSAwIDAgMCAuNzUuNzVoMTkuNWEuNzUuNzUgMCAwIDAgLjc1LS43NVY0LjVhLjc1Ljc1IDAgMCAwLS43NS0uNzVIOC4yNUw2IDIuMjVIMi4yNVoiLz4KPC9zdmc+Cjwvc3ZnPgo8L3N2Zz4='; 
+                      }}
                     />
                     {isAdmin && (
                       <div className='absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded text-xs'>
