@@ -1,8 +1,24 @@
 import express from "express"
 import mongoose from 'mongoose'
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
+// Import all routes
+import authRoute from "./routes/AuthRouter.js";
+import publicationRoute from "./routes/publicationRoute.js";
+import resultRoute from "./routes/resultRoute.js";
+import CourseRoute from "./routes/courseRoute.js";
+import noticeRoute from "./routes/noticeRoute.js";
+import studentRoute from "./routes/studentRoute.js";
+import emailRoute from "./routes/emailRoute.js";
+import galleryRoute from "./routes/galleryRoute.js";
+
 config();
+
+// Get __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 3000;
 const mongoDBURL = process.env.mongoDBURL;
@@ -35,13 +51,22 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-console.log('CORS configured');
+// Handle preflight requests
+app.options('*', cors());
+
+// Middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+console.log('CORS and middleware configured');
 
 // Basic routes
 app.get('/', (req, res) => {
-    console.log('Root route accessed');
     res.json({ 
-        message: "Paragon API - Minimal Test Version",
+        message: "Paragon API - Production Ready",
         status: "working",
         mongodb: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
         timestamp: new Date().toISOString(),
@@ -50,9 +75,22 @@ app.get('/', (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-    console.log('Health check accessed');
-    res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+    res.json({ 
+        status: 'healthy', 
+        timestamp: new Date().toISOString(),
+        mongodb: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
+    });
 });
+
+// Routes
+app.use('/auth', authRoute);
+app.use('/admin', publicationRoute);
+app.use('/admin', resultRoute);
+app.use('/admin', CourseRoute);
+app.use('/admin', noticeRoute);
+app.use('/admin', studentRoute);
+app.use('/admin', emailRoute);
+app.use('/gallery', galleryRoute);
 
 console.log('Routes configured');
 
