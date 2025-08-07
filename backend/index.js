@@ -21,36 +21,44 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load environment variables from .env file
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 const mongoDBURL = process.env.mongoDBURL;
-const HTTPURLFrontend = process.env.HTTPURLFrontend;
+const HTTPURLFrontend = process.env.HTTPURLFrontend || 'http://localhost:5173';
 const app = express();
 
+// MongoDB connection
 mongoose
     .connect(mongoDBURL)
     .then(()=>{
-        app.listen(PORT, () => {
-        console.log('App is listening to port: ' + PORT);
-        });
+        console.log('MongoDB Connected Successfully');
+        console.log('App is listening on port: ' + PORT);
     })
     .catch((error)=>{
-        console.log(error);
+        console.log('MongoDB connection error:', error);
     });
 
-// Enable CORS for all routes
+// Enable CORS for all routes - Railway friendly
 app.use(cors({
-    origin: HTTPURLFrontend, // Replace with your frontend URL
+    origin: [HTTPURLFrontend, 'http://localhost:5173', 'http://localhost:3000'],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 // Serve static files from backend uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/', (request, response) =>{
-    console.log(request);
-    return response.status(234).send("Welcome to Paragon");
+    return response.status(200).json({
+        message: "Paragon API - Railway Deployment",
+        status: "working",
+        mongodb: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development'
+    });
 });
 
 // Apply express.json() to auth routes that need JSON parsing
@@ -74,3 +82,11 @@ app.use('/admin', studentRoute);
 
 // Gallery routes (public access for viewing, admin for management)
 app.use('/gallery', galleryRoute);
+
+// Start server
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
+});
+
+// For Railway deployment
+export default app;
