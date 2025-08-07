@@ -13,8 +13,8 @@ const createUploadDirectories = () => {
         'uploads/gallery',
         'uploads/courses',
         'uploads/notices',
-        'uploads/publications',
-        'uploads/results',
+        'uploads/Publications',
+        'uploads/Results',
         'uploads/students'
     ];
 
@@ -38,7 +38,7 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // Use req.uploadSubfolder to determine subfolder, default to 'uploads'
     const subfolder = req.uploadSubfolder || 'uploads';
-    const uploadPath = `uploads/${subfolder.toLowerCase()}`;
+    const uploadPath = `uploads/${subfolder}`;
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
