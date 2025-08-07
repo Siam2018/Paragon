@@ -2,19 +2,20 @@
   "name": "frontend",
   "private": true,
   "version": "0.0.0",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "npm run build && node server.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
     "axios": "^1.10.0",
     "dotenv": "^17.2.1",
-    "express": "^5.1.0",
+    "express": "^4.21.1",
     "lucide-react": "^0.525.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
