@@ -1,4 +1,4 @@
-import { Notice } from "../models/noticemodel.js";
+import { Notice } from "../../frontend/models/noticemodel.js";
 
 const NoticeController = {
     createNotice: async (request, response) => {

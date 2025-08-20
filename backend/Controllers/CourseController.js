@@ -1,4 +1,4 @@
-import { Course } from "../models/coursemodel.js";
+import { Course } from "../../frontend/models/coursemodel.js";
 
 const CourseController = {
     createCourse: async (request, response) => {

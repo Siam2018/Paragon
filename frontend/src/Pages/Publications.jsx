@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+
 import Spinner from '../Components/Spinner';
 import Navbar from '../Components/Navbar.jsx';
 import Hero from '../Components/Hero.jsx';
 import Footer from '../Components/Footer.jsx';
+import { uploadToCloudinary } from '../utils/cloudinaryUpload';
+import { handleSuccess, handleError } from '../utils/toast';
 
-const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
+
 
 const Publications = () => {
   const navigate = useNavigate();
@@ -28,7 +30,7 @@ const Publications = () => {
       setLoading(true);
       const token = localStorage.getItem('jwtToken');
       try {
-        const res = await fetch(`${BACKEND_URL}/admin/Publication`, {
+  const res = await fetch(`/api/publication`, {
           headers: {
             'Content-Type': 'application/json',
             ...(token ? { 'Authorization': `Bearer ${token}` } : {})
@@ -63,31 +65,47 @@ const Publications = () => {
     setFormError(null);
     const token = localStorage.getItem('jwtToken');
     try {
+      let imageUrl = '';
+      if (imageFile) {
+        imageUrl = await uploadToCloudinary(imageFile, 'Publications');
+      }
       let res, updatedPub;
-      const form = new FormData();
-      form.append('Title', formData.Title);
-      form.append('Description', formData.Description);
-      if (imageFile) form.append('Image', imageFile);
       if (editId) {
         // Update existing
-        res = await fetch(`${BACKEND_URL}/admin/Publication/${editId}`, {
+  res = await fetch(`/api/publication/${editId}`, {
           method: 'PUT',
-          headers: { Authorization: `Bearer ${token}` },
-          body: form,
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            Title: formData.Title,
+            Description: formData.Description,
+            ImageURL: imageUrl
+          }),
         });
         if (!res.ok) throw new Error('Failed to update publication');
         updatedPub = await res.json();
         setPublications(publications.map(pub => (pub._id === editId ? updatedPub : pub)));
+        handleSuccess('Publication updated successfully!');
       } else {
         // Create new
-        res = await fetch(`${BACKEND_URL}/admin/Publication`, {
+  res = await fetch(`/api/publication`, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: form,
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            Title: formData.Title,
+            Description: formData.Description,
+            ImageURL: imageUrl
+          }),
         });
         if (!res.ok) throw new Error('Failed to create publication');
         const newPub = await res.json();
         setPublications([newPub, ...publications]);
+        handleSuccess('Publication created successfully!');
       }
       setShowForm(false);
       setFormData({ Title: '', Description: '', ImageName: '' });
@@ -95,6 +113,7 @@ const Publications = () => {
       setEditId(null);
     } catch (err) {
       setFormError(err.message);
+      handleError(err.message);
     } finally {
       setFormLoading(false);
     }
@@ -131,7 +150,7 @@ const Publications = () => {
       // Create a File object from the existing image to populate the file input
       if (pub.ImageURL) {
         try {
-          const response = await fetch(`${BACKEND_URL}/uploads/Publications/${pub.ImageURL.replace(/^.*[\\/]/, '')}`);
+          const response = await fetch(pub.ImageURL);
           const blob = await response.blob();
           const file = new File([blob], pub.ImageURL.replace(/^.*[\\/]/, ''), { type: blob.type });
           setImageFile(file);
@@ -300,7 +319,7 @@ const Publications = () => {
                 >
                   <div className='aspect-[3/4] overflow-hidden'>
                     <img
-                      src={pub.ImageURL ? `${BACKEND_URL}/uploads/Publications/${pub.ImageURL.replace(/^.*[\\/]/, '')}` : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDMwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9IjIwMCIgcj0iNDAiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2ZyB4PSIxMzAiIHk9IjE4MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRkZGRkZGIiB2aWV3Qm94PSIwIDAgMjQgMjQiPgo8cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik00IDJBMiAyIDAgMCAwIDIgNHYxNmEyIDIgMCAwIDAgMiAyaDE2YTIgMiAwIDAgMCAyLTJWNGEyIDIgMCAwIDAtMi0ySDR6Ii8+CjxwYXRoIGZpbGw9IiM5Q0EzQUYiIGQ9Ik02IDhoMTJ2Mkg2VjhaLTIgMTJoMTJ2Mkg2VjEyWi0yIDEyaDJ2Mkg2VjEyWm02IDBINnYySDE2SDE2VjEyWm0tNiAwaDJWMkg2VjEyeiIvPgo8L3N2Zz4KPC9zdmc+'}
+                      src={pub.ImageURL ? pub.ImageURL : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDMwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjE1MCIgY3k9IjIwMCIgcj0iNDAiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2ZyB4PSIxMzAiIHk9IjE4MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRkZGRkZGIiB2aWV3Qm94PSIwIDAgMjQgMjQiPgo8cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik00IDJBMiAyIDAgMCAwIDIgNHYxNmEyIDIgMCAwIDAgMiAyaDE2YTIgMiAwIDAgMCAyLTJWNGEyIDIgMCAwIDAtMi0ySDR6Ii8+CjxwYXRoIGZpbGw9IiM5Q0EzQUYiIGQ9Ik02IDhoMTJ2Mkg2VjhaLTIgMTJoMTJ2Mkg2VjEyWi0yIDEyaDJ2Mkg2VjEyWm02IDBINnYySDE2SDE2VjEyWm0tNiAwaDJWMkg2VjEyeiIvPgo8L3N2Zz4KPC9zdmc+'}
                       alt={pub.Title || 'Publication Image'}
                       className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'
                       onError={e => { 

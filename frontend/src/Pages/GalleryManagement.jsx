@@ -3,9 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Upload, Edit, Trash2, Eye, Plus, X, Image as ImageIcon } from 'lucide-react';
 import Navbar from '../Components/Navbar.jsx';
 import Footer from '../Components/Footer.jsx';
-import { toast, ToastContainer } from 'react-toastify';
 
-const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
+import { uploadToCloudinary } from '../utils/cloudinaryUpload';
+import { handleSuccess, handleError } from '../utils/toast';
+import { ToastContainer } from 'react-toastify';
+
+
 
 const GalleryManagement = () => {
   const navigate = useNavigate();
@@ -42,7 +45,7 @@ const GalleryManagement = () => {
   const fetchImages = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${BACKEND_URL}/api/gallery`);
+  const response = await fetch(`/api/gallery`);
       const data = await response.json();
       
       if (data.success) {
@@ -73,47 +76,43 @@ const GalleryManagement = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    
     if (!selectedFile && !selectedImage) {
-      toast.error('Please select an image');
+      handleError('Please select an image');
       return;
     }
-
     try {
       setLoading(true);
-      const formDataToSend = new FormData();
-      
-      formDataToSend.append('isActive', formData.isActive);
-      
+      let imageUrl = '';
       if (selectedFile) {
-        formDataToSend.append('image', selectedFile);
+        imageUrl = await uploadToCloudinary(selectedFile, 'gallery');
+      } else if (selectedImage) {
+        imageUrl = selectedImage.imageURL;
       }
-
       const url = selectedImage 
-        ? `${BACKEND_URL}/api/gallery/${selectedImage._id}`
-        : `${BACKEND_URL}/api/gallery`;
-      
+        ? `/api/gallery/${selectedImage._id}`
+        : `/api/gallery`;
       const method = selectedImage ? 'PUT' : 'POST';
-
       const response = await fetch(url, {
         method: method,
-        body: formDataToSend
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageURL: imageUrl,
+          isActive: formData.isActive
+        })
       });
-
       const data = await response.json();
-      
       if (data.success) {
-        toast.success(selectedImage ? 'Image updated successfully' : 'Image uploaded successfully');
+        handleSuccess(selectedImage ? 'Image updated successfully' : 'Image uploaded successfully');
         fetchImages();
         resetForm();
         setShowUploadModal(false);
         setShowEditModal(false);
       } else {
-        toast.error(data.message || 'Operation failed');
+        handleError(data.message || 'Operation failed');
       }
     } catch (error) {
       console.error('Error:', error);
-      toast.error('Error processing request');
+      handleError('Error processing request');
     } finally {
       setLoading(false);
     }
@@ -126,7 +125,7 @@ const GalleryManagement = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`${BACKEND_URL}/api/gallery/${imageId}`, {
+  const response = await fetch(`/api/gallery/${imageId}`, {
         method: 'DELETE'
       });
 
@@ -151,7 +150,7 @@ const GalleryManagement = () => {
     setFormData({
       isActive: image.isActive
     });
-    setPreviewUrl(`${BACKEND_URL}/uploads/gallery/${image.imageURL}`);
+  setPreviewUrl(image.imageURL);
     setShowEditModal(true);
   };
 
@@ -207,7 +206,7 @@ const GalleryManagement = () => {
               <div key={image._id} className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="aspect-w-16 aspect-h-12 relative">
                   <img
-                    src={`${BACKEND_URL}/uploads/gallery/${image.imageURL}`}
+                    src={image.imageURL}
                     alt={image.title}
                     className="w-full h-40 sm:h-48 object-cover"
                   />

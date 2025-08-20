@@ -6,7 +6,7 @@ import Navbar from '../Components/Navbar.jsx';
 import Footer from '../Components/Footer.jsx';
 import Spinner from '../Components/Spinner.jsx';
 
-const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
+
 
 const EditStudent = () => {
   const { id } = useParams();
@@ -77,7 +77,7 @@ const EditStudent = () => {
   const fetchStudentData = async () => {
     try {
       const token = localStorage.getItem('jwtToken');
-      const response = await axios.get(`${BACKEND_URL}/admin/Admin/Student/${id}`, {
+  const response = await axios.get(`/api/admin/student/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -117,7 +117,7 @@ const EditStudent = () => {
 
     try {
       const token = localStorage.getItem('jwtToken');
-      await axios.put(`${BACKEND_URL}/admin/Admin/Student/${id}`, formData, {
+  await axios.put(`/api/admin/student/${id}`, formData, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`

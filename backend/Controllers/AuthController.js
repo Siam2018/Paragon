@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import AdminModel from '../models/adminmodel.js';
+import AdminModel from '../../frontend/models/adminmodel.js';
 
 const adminRegister = async (request, response) => {
     try {

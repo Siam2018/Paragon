@@ -1,6 +1,6 @@
 
 import express from "express";
-import { Publication } from "../models/publicationmodel.js";
+import { Publication } from "../../frontend/models/publicationmodel.js";
 const router = express.Router();
 import Auth from "../Middlewares/Auth.js";
 import dynamicUpload from "../Middlewares/FileUpload.js";

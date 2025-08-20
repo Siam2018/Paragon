@@ -6,7 +6,7 @@ import Navbar from '../Components/Navbar.jsx';
 import Footer from '../Components/Footer.jsx';
 import Spinner from '../Components/Spinner.jsx';
 
-const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
+
 
 const DeleteStudent = () => {
   const { id } = useParams();
@@ -33,7 +33,7 @@ const DeleteStudent = () => {
   const fetchStudentData = async () => {
     try {
       const token = localStorage.getItem('jwtToken');
-      const response = await axios.get(`${BACKEND_URL}/admin/Admin/Student/${id}`, {
+  const response = await axios.get(`/api/admin/student/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -54,7 +54,7 @@ const DeleteStudent = () => {
 
     try {
       const token = localStorage.getItem('jwtToken');
-      await axios.delete(`${BACKEND_URL}/admin/Admin/Student/${id}`, {
+  await axios.delete(`/api/admin/student/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

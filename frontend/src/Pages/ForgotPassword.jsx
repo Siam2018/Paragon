@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 
-const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
+
 
 const ForgotPassword = () => {
   const [step, setStep] = useState(1); // 1: Enter email, 2: Enter code and new password
@@ -27,7 +27,7 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${BACKEND_URL}/admin/send-password-reset-email`, {
+  const response = await fetch(`/api/send-password-reset-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,4 +1,4 @@
-import { Gallery } from '../models/gallerymodel.js';
+import { Gallery } from '../../frontend/models/gallerymodel.js';
 import path from 'path';
 import fs from 'fs';
 

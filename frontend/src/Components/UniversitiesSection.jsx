@@ -1,4 +1,6 @@
 import React from 'react';
+import BUP from '../assets/Universites/BUP.svg'
+import JagannathUniversity from '../assets/Universites/jagannathUniversity.png';
 
 const UniversitiesSection = () => {
   const universities = [
@@ -13,14 +15,14 @@ const UniversitiesSection = () => {
       image: "https://uccgroup.com.bd/uploads/uni_list/2.jpg"
     },
     {
-      name: "Bangladesh Agricultural",
-      url: "https://bau.edu.bd/",
-      image: "https://uccgroup.com.bd/uploads/uni_list/3.jpg"
+      name: "Jagannath University",
+      url: "https://jnu.ac.bd/",
+      image: JagannathUniversity
     },
     {
-      name: "Engineering & Technology",
-      url: "https://www.buet.ac.bd/web/",
-      image: "https://uccgroup.com.bd/uploads/uni_list/4.jpg"
+      name: "Bangladesh University of Professionals",
+      url: "https://bup.edu.bd/",
+      image: BUP
     },
     {
       name: "University of Chittagong",

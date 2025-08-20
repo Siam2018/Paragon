@@ -5,7 +5,7 @@ import paragonlogo from '../assets/ParagonLogo2-Photoroom2.png';
 import { ToastContainer, toast } from 'react-toastify';
 
 // Backend URL from environment variable
-const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
+
 
 const Admission = () => {
   const [formData, setFormData] = useState({

@@ -1,4 +1,4 @@
-import { Publication } from '../models/publicationmodel.js';
+import { Publication } from '../../frontend/models/publicationmodel.js';
 export const createPublication = async (request, response) => {
     try {
         const { Title, Description } = request.body;

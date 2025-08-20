@@ -6,7 +6,7 @@ import Navbar from '../Components/Navbar.jsx';
 import Hero from '../Components/Hero.jsx';
 import Footer from '../Components/Footer.jsx';
 
-const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
+
 
 const Courses = () => {
   const navigate = useNavigate();
@@ -66,7 +66,7 @@ const Courses = () => {
       setLoading(true);
       const token = localStorage.getItem('jwtToken');
       try {
-        const res = await fetch(`${BACKEND_URL}/admin/Course`, {
+  const res = await fetch(`/api/course`, {
           headers: {
             'Content-Type': 'application/json',
             ...(token ? { 'Authorization': `Bearer ${token}` } : {})
@@ -114,7 +114,7 @@ const Courses = () => {
       if (imageFile) form.append('Image', imageFile);
       if (editId) {
         // Update existing
-        res = await fetch(`${BACKEND_URL}/admin/Course/${editId}`, {
+  res = await fetch(`/api/course/${editId}`, {
           method: 'PUT',
           headers: { Authorization: `Bearer ${token}` },
           body: form,
@@ -124,7 +124,7 @@ const Courses = () => {
         setCourses(courses.map(c => (c._id === editId ? updatedCourse : c)));
       } else {
         // Create new
-        res = await fetch(`${BACKEND_URL}/admin/Course`, {
+  res = await fetch(`/api/course`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: form,
@@ -161,7 +161,7 @@ const Courses = () => {
     setFormError(null);
     const token = localStorage.getItem('jwtToken');
     try {
-      const res = await fetch(`${BACKEND_URL}/admin/Course/${editId}`, {
+  const res = await fetch(`/api/course/${editId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

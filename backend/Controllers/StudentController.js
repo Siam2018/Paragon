@@ -1,4 +1,4 @@
-import { Student } from "../models/studentmodel.js";
+import { Student } from "../../frontend/models/studentmodel.js";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 

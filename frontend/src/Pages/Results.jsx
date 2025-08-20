@@ -1,12 +1,14 @@
 
 import React, { useEffect, useState } from 'react';
+import { uploadToCloudinary } from '../utils/cloudinaryUpload';
+import { handleSuccess, handleError } from '../utils/toast';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../Components/Spinner';
 import Navbar from '../Components/Navbar.jsx';
 import Hero from '../Components/Hero.jsx';
 import Footer from '../Components/Footer.jsx';
 
-const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
+
 
 const Results = () => {
   const navigate = useNavigate();
@@ -26,7 +28,7 @@ const Results = () => {
       setLoading(true);
       const token = localStorage.getItem('jwtToken');
       try {
-        const res = await fetch(`${BACKEND_URL}/admin/Result`, {
+  const res = await fetch(`/api/result`, {
           headers: {
             'Content-Type': 'application/json',
             ...(token ? { 'Authorization': `Bearer ${token}` } : {})
@@ -60,31 +62,47 @@ const Results = () => {
     setFormError(null);
     const token = localStorage.getItem('jwtToken');
     try {
-  let res, updatedResult;
-  const form = new FormData();
-  form.append('Title', formData.Title || '');
-  form.append('Description', formData.Description || '');
-  if (imageFile) form.append('Image', imageFile);
+      let imageUrl = '';
+      if (imageFile) {
+        imageUrl = await uploadToCloudinary(imageFile, 'results');
+      }
+      let res, updatedResult;
       if (editId) {
         // Update existing
-        res = await fetch(`${BACKEND_URL}/admin/Result/${editId}`, {
+        res = await fetch(`/api/result/${editId}`, {
           method: 'PUT',
-          headers: { Authorization: `Bearer ${token}` },
-          body: form,
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            Title: formData.Title,
+            Description: formData.Description,
+            ImageURL: imageUrl
+          }),
         });
         if (!res.ok) throw new Error('Failed to update result');
         updatedResult = await res.json();
         setResults(results.map(r => (r._id === editId ? updatedResult : r)));
+        handleSuccess('Result updated successfully!');
       } else {
         // Create new
-        res = await fetch(`${BACKEND_URL}/admin/Result`, {
+        res = await fetch('/api/result', {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: form,
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            Title: formData.Title,
+            Description: formData.Description,
+            ImageURL: imageUrl
+          }),
         });
         if (!res.ok) throw new Error('Failed to create result');
         const newResult = await res.json();
         setResults([newResult, ...results]);
+        handleSuccess('Result created successfully!');
       }
       setShowForm(false);
       setFormData({ Title: '', Description: '', ImageName: '' });
@@ -92,6 +110,7 @@ const Results = () => {
       setEditId(null);
     } catch (err) {
       setFormError(err.message);
+      handleError(err.message);
     } finally {
       setFormLoading(false);
     }
@@ -103,7 +122,7 @@ const Results = () => {
     setFormError(null);
     const token = localStorage.getItem('jwtToken');
     try {
-      const res = await fetch(`${BACKEND_URL}/admin/Result/${editId}`, {
+  const res = await fetch(`/api/result/${editId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -228,7 +247,7 @@ const Results = () => {
               >
                 <div className='aspect-[4/3] overflow-hidden'>
                   <img
-                    src={result.ImageURL ? `${BACKEND_URL}/uploads/Results/${result.ImageURL.replace(/^.*[\\/]/, '')}` : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI0MCIgdmlld0JveD0iMCAwIDQwMCAyNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjEyMCIgcj0iNDAiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2ZyB4PSIxODAiIHk9IjEwMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRkZGRkZGIiB2aWV3Qm94PSIwIDAgMjQgMjQiPgo8cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik0xMiAyQTEwIDEwIDAgMCAwIDIgMTJhMTAgMTAgMCAwIDAgMTAgMTBBMTAgMTAgMCAwIDAgMTIgMlptMCAxOGE4IDggMCAxIDEgOC04QTggOCAwIDAgMSAxMiAyMFptMS4zLTEyYTEuMyAxLjMgMCAwIDAtMi42IDBjMCAuNy41IDEuMyAxLjMgMS4zaDFWMTZhMSAxIDAgMCAwIDItMXYtNGMwLS43LS42LTEuMy0xLjMtMS4zWm0wIDEwYTEuMyAxLjMgMCAxIDAgMC0yLjZBMS4zIDEuMyAwIDAgMCAxMy4zIDE4WiIvPgo8L3N2Zz4KPC9zdmc+'}
+                    src={result.ImageURL ? result.ImageURL : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI0MCIgdmlld0JveD0iMCAwIDQwMCAyNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjEyMCIgcj0iNDAiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2ZyB4PSIxODAiIHk9IjEwMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRkZGRkZGIiB2aWV3Qm94PSIwIDAgMjQgMjQiPgo8cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik0xMiAyQTEwIDEwIDAgMCAwIDIgMTJhMTAgMTAgMCAwIDAgMTAgMTBBMTAgMTAgMCAwIDAgMTIgMlptMCAxOGE4IDggMCAxIDEgOC04QTggOCAwIDAgMSAxMiAyMFptMS4zLTEyYTEuMyAxLjMgMCAwIDAtMi42IDBjMCAuNy41IDEuMyAxLjMgMS4zaDFWMTZhMSAxIDAgMCAwIDItMXYtNGMwLS43LS42LTEuMy0xLjMtMS4zWm0wIDEwYTEuMyAxLjMgMCAxIDAgMC0yLjZBMS4zIDEuMyAwIDAgMCAxMy4zIDE4WiIvPgo8L3N2Zz4KPC9zdmc+'}
                     alt={result.Title || 'Result Image'}
                     className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
                     onError={e => { 

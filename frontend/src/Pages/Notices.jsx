@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import Spinner from '../Components/Spinner';
 import Navbar from '../Components/Navbar.jsx';
 import Hero from '../Components/Hero.jsx';
 import Footer from '../Components/Footer.jsx';
+import { uploadToCloudinary } from '../utils/cloudinaryUpload';
+import { handleSuccess, handleError } from '../utils/toast';
 
-const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
+
 
 const Notices = () => {
   const navigate = useNavigate();
@@ -29,7 +32,7 @@ const Notices = () => {
       setLoading(true);
       const token = localStorage.getItem('jwtToken');
       try {
-        const res = await fetch(`${BACKEND_URL}/admin/Notice`, {
+  const res = await fetch(`/api/notice`, {
           headers: {
             'Content-Type': 'application/json',
             ...(token ? { 'Authorization': `Bearer ${token}` } : {})
@@ -72,18 +75,24 @@ const Notices = () => {
     setFormError(null);
     const token = localStorage.getItem('jwtToken');
     try {
+      let pdfUrl = '';
+      if (pdfFile) {
+        pdfUrl = await uploadToCloudinary(pdfFile, 'notices');
+      }
       let res, updatedNotice;
-      const form = new FormData();
-      form.append('Title', formData.Title);
-      form.append('Description', formData.Description);
-      if (pdfFile) form.append('PDF', pdfFile);
-      
       if (editId) {
         // Update existing
-        res = await fetch(`${BACKEND_URL}/admin/Notice/${editId}`, {
+  res = await fetch(`/api/notice/${editId}`, {
           method: 'PUT',
-          headers: { Authorization: `Bearer ${token}` },
-          body: form,
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            Title: formData.Title,
+            Description: formData.Description,
+            PDFURL: pdfUrl
+          }),
         });
         if (!res.ok) throw new Error('Failed to update notice');
         updatedNotice = await res.json();
@@ -92,17 +101,24 @@ const Notices = () => {
           .sort((a, b) => new Date(b.createdAt || b._id) - new Date(a.createdAt || a._id));
         setAllNotices(updatedAllNotices);
         setTotalNotices(updatedAllNotices.length);
-        
         // Update current page
         const startIndex = (currentPage - 1) * noticesPerPage;
         const endIndex = startIndex + noticesPerPage;
         setNotices(updatedAllNotices.slice(startIndex, endIndex));
+        handleSuccess('Notice updated successfully!');
       } else {
         // Create new
-        res = await fetch(`${BACKEND_URL}/admin/Notice`, {
+  res = await fetch(`/api/notice`, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: form,
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            Title: formData.Title,
+            Description: formData.Description,
+            PDFURL: pdfUrl
+          }),
         });
         if (!res.ok) throw new Error('Failed to create notice');
         const newNotice = await res.json();
@@ -110,10 +126,10 @@ const Notices = () => {
         const updatedAllNotices = [newNotice, ...allNotices];
         setAllNotices(updatedAllNotices);
         setTotalNotices(updatedAllNotices.length);
-        
         // Reset to first page to show the new notice
         setCurrentPage(1);
         setNotices(updatedAllNotices.slice(0, noticesPerPage));
+        handleSuccess('Notice created successfully!');
       }
       setShowForm(false);
       setFormData({ Title: '', Description: '' });
@@ -121,6 +137,7 @@ const Notices = () => {
       setEditId(null);
     } catch (err) {
       setFormError(err.message);
+      handleError(err.message);
     } finally {
       setFormLoading(false);
     }
@@ -132,7 +149,7 @@ const Notices = () => {
     setFormError(null);
     const token = localStorage.getItem('jwtToken');
     try {
-      const res = await fetch(`${BACKEND_URL}/admin/Notice/${editId}`, {
+  const res = await fetch(`/api/notice/${editId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -320,7 +337,7 @@ const Notices = () => {
                     {notice.PDFURL && (
                       <div className='w-full sm:w-auto sm:ml-4 sm:flex-shrink-0'>
                         <a 
-                          href={`${BACKEND_URL}/uploads/notices/${notice.PDFURL}`}
+                          href={notice.PDFURL}
                           target="_blank"
                           rel="noopener noreferrer"
                           className='block w-full sm:w-auto bg-sky-500 text-white py-2 px-4 sm:py-2.5 sm:px-5 rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm sm:text-base font-medium text-center'

@@ -6,7 +6,7 @@ import Navbar from '../Components/Navbar.jsx'
 import paragonlogo from '../assets/ParagonLogo2-Photoroom2.png'
 import {ToastContainer, toast} from 'react-toastify'
 
-const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
+
 
 const AdminSignIn = () => {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ const AdminSignIn = () => {
       return;
     }
     try {
-      const response = await fetch(`${BACKEND_URL}/auth/Admin/Signin`, {
+  const response = await fetch(`/api/auth/Admin/Signin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

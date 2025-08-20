@@ -1,4 +1,4 @@
-import { Result } from "../models/resultmodel.js";
+import { Result } from "../../frontend/models/resultmodel.js";
 const ResultController = {
     createResult: async (request, response) => {
         try {

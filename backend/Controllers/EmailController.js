@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
-import { Student } from '../models/studentmodel.js';
+import { Student } from '../../frontend/models/studentmodel.js';
 
 // In-memory storage for verification codes (in production, use Redis or database)
 const verificationCodes = new Map();
