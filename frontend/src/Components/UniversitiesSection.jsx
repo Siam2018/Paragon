@@ -1,6 +1,6 @@
 import React from 'react';
-import BUP from '../assets/Universites/BUP.svg'
-import JagannathUniversity from '../assets/Universites/jagannathUniversity.png';
+import BUP from '../assets/Universities/BUP.svg';
+import JagannathUniversity from '../assets/Universities/jagannathUniversity.png';
 
 const UniversitiesSection = () => {
   const universities = [
