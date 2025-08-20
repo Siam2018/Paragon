@@ -1,8 +1,7 @@
-// Serverless API route for authentication
 import Joi from 'joi';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { dbConnect } from './_db.js';
+import { dbConnect } from '../_db.js';
 import AdminModel from '../models/adminmodel.js';
 
 const adminRegisterValidation = (body) => {
@@ -24,7 +23,10 @@ const adminSigninValidation = (body) => {
 
 export default async function handler(req, res) {
   await dbConnect();
-  if (req.method === 'POST' && req.url.endsWith('/Admin/Register')) {
+  const { id = [] } = req.query;
+  const action = Array.isArray(id) ? id.join('/') : id;
+
+  if (req.method === 'POST' && (action === 'Admin/Register' || req.url.endsWith('/Admin/Register'))) {
     // Register
     const { error } = adminRegisterValidation(req.body);
     if (error) return res.status(400).json({ message: error.message });
@@ -40,7 +42,7 @@ export default async function handler(req, res) {
     } catch (error) {
       return res.status(500).json({ message: 'Internal server error' });
     }
-  } else if (req.method === 'POST' && req.url.endsWith('/Admin/Signin')) {
+  } else if (req.method === 'POST' && (action === 'Admin/Signin' || req.url.endsWith('/Admin/Signin'))) {
     // Signin
     const { error } = adminSigninValidation(req.body);
     if (error) return res.status(400).json({ message: error.message });

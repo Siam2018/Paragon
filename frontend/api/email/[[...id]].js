@@ -1,7 +1,6 @@
-// Serverless API route for email
 import nodemailer from 'nodemailer';
 import bcrypt from 'bcryptjs';
-import { dbConnect } from './_db.js';
+import { dbConnect } from '../_db.js';
 import { Student } from '../models/studentmodel.js';
 
 const verificationCodes = new Map();
@@ -18,8 +17,10 @@ const createTransporter = () => nodemailer.createTransport({
 
 export default async function handler(req, res) {
   await dbConnect();
-  // Send verification email
-  if (req.method === 'POST' && req.url.endsWith('/send-verification-email')) {
+  const { id = [] } = req.query;
+  const action = Array.isArray(id) ? id.join('/') : id;
+
+  if (req.method === 'POST' && (action === 'send-verification-email' || req.url.endsWith('/send-verification-email'))) {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: 'Email is required' });
     if (!isValidEmail(email)) return res.status(400).json({ message: 'Please enter a valid email address' });
@@ -37,8 +38,7 @@ export default async function handler(req, res) {
     await transporter.sendMail(mailOptions);
     return res.status(200).json({ message: 'Verification email sent successfully', email });
   }
-  // Verify email code
-  else if (req.method === 'POST' && req.url.endsWith('/verify-email-code')) {
+  else if (req.method === 'POST' && (action === 'verify-email-code' || req.url.endsWith('/verify-email-code'))) {
     const { email, code } = req.body;
     if (!email || !code) return res.status(400).json({ message: 'Email and code are required' });
     const storedData = verificationCodes.get(email);
@@ -51,8 +51,7 @@ export default async function handler(req, res) {
     verificationCodes.delete(email);
     return res.status(200).json({ message: 'Email verified successfully', verified: true });
   }
-  // Send password reset email
-  else if (req.method === 'POST' && req.url.endsWith('/send-password-reset-email')) {
+  else if (req.method === 'POST' && (action === 'send-password-reset-email' || req.url.endsWith('/send-password-reset-email'))) {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: 'Email is required' });
     if (!isValidEmail(email)) return res.status(400).json({ message: 'Please enter a valid email address' });
@@ -70,8 +69,7 @@ export default async function handler(req, res) {
     await transporter.sendMail(mailOptions);
     return res.status(200).json({ message: 'Password reset email sent successfully', email });
   }
-  // Reset password with code
-  else if (req.method === 'POST' && req.url.endsWith('/reset-password')) {
+  else if (req.method === 'POST' && (action === 'reset-password' || req.url.endsWith('/reset-password'))) {
     const { email, code, newPassword } = req.body;
     if (!email || !code || !newPassword) return res.status(400).json({ message: 'Email, code, and new password are required' });
     if (newPassword.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters long' });
