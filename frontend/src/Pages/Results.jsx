@@ -60,8 +60,11 @@ const Results = () => {
     setFormError(null);
     const token = localStorage.getItem('jwtToken');
     try {
-      let res, updatedResult;
-      const form = new FormData();`r`n      form.append('Title', formData.Title || '');`r`n      form.append('Description', formData.Description || '');`r`n      if (imageFile) form.append('Image', imageFile);`r`n      form.append('Description', formData.Description);`r`n      if (imageFile) form.append('Image', imageFile);
+  let res, updatedResult;
+  const form = new FormData();
+  form.append('Title', formData.Title || '');
+  form.append('Description', formData.Description || '');
+  if (imageFile) form.append('Image', imageFile);
       if (editId) {
         // Update existing
         res = await fetch(`${BACKEND_URL}/admin/Result/${editId}`, {
