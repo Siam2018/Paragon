@@ -57,7 +57,7 @@ const CoursesSection = () => {
     const fetchCourses = async () => {
       try {
         
-        const response = await fetch(`/api/admin/Course`);
+  const response = await fetch(`/api/course`);
         if (!response.ok) throw new Error('Failed to fetch courses');
         const data = await response.json();
         
