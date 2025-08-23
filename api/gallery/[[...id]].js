@@ -1,6 +1,6 @@
 import dbConnect from '../_db.js';
 import Gallery from '../../models/gallerymodel.js';
-import { verifyAdmin } from '../Middlewares/Auth';
+import { verifyAdmin } from '../../Middlewares/Auth.js';
 
 export default async function handler(req, res) {
   await dbConnect();
