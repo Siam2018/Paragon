@@ -1,5 +1,5 @@
 import dbConnect from '../_db.js';
-import Notice from '../models/noticemodel';
+import Notice from '../../models/noticemodel.js';
 import { verifyAdmin } from '../Middlewares/Auth';
 
 export default async function handler(req, res) {

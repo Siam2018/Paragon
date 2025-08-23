@@ -1,5 +1,5 @@
 import dbConnect from '../_db.js';
-import Student from '../models/studentmodel';
+import Student from '../../models/studentmodel.js';
 import { verifyAdmin } from '../Middlewares/Auth';
 
 export default async function handler(req, res) {

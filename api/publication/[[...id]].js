@@ -1,5 +1,5 @@
 import dbConnect from '../_db.js';
-import Publication from '../models/publicationmodel';
+import Publication from '../../models/publicationmodel.js';
 import { verifyAdmin } from '../Middlewares/Auth';
 
 export default async function handler(req, res) {
