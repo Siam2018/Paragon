@@ -3,8 +3,6 @@ import ParagonLogo from '../assets/ParagonLogo2.png'
 import { Menu, X, User, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
-const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
-
 function Navbar() {
   const [count, setCount] = useState(0)
   const [isOpen, setIsOpen] = useState(false);
@@ -204,7 +202,7 @@ function Navbar() {
                     onClick={handleProfileClick}
                   >
                     <img
-                      src={student.ProfilePicture ? `${BACKEND_URL}${student.ProfilePicture}` : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"}
+                      src={student.ProfilePicture ? student.ProfilePicture : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"}
                       alt="Profile"
                       className="w-full h-full object-cover rounded-full"
                     />
@@ -268,7 +266,7 @@ function Navbar() {
                 className="w-8 h-8 xl:w-10 xl:h-10 rounded-full overflow-hidden border-2 border-white cursor-pointer hover:border-yellow-300 transition-colors shadow-md"
               >
                 <img
-                  src={student.ProfilePicture ? `${BACKEND_URL}${student.ProfilePicture}` : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"}
+                  src={student.ProfilePicture ? student.ProfilePicture : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"}
                   alt="Profile"
                   className="w-full h-full object-cover"
                 />

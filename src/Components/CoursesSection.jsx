@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
-
 const CoursesSection = () => {
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
@@ -59,7 +57,7 @@ const CoursesSection = () => {
     const fetchCourses = async () => {
       try {
         
-        const response = await fetch(`${BACKEND_URL}/admin/Course`);
+        const response = await fetch(`/api/admin/Course`);
         if (!response.ok) throw new Error('Failed to fetch courses');
         const data = await response.json();
         

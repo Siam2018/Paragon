@@ -1,14 +1,25 @@
-import dbConnect from '../_db';
+import dbConnect from '../_db.js';
 import Gallery from '../models/gallerymodel';
 import { verifyAdmin } from '../Middlewares/Auth';
 
 export default async function handler(req, res) {
   await dbConnect();
   const {
-    query: { id = [] },
+    query: { id = [], limit },
     method,
   } = req;
   const galleryId = Array.isArray(id) ? id[0] : id;
+
+  // Handle /api/gallery/random?limit=6
+  if (galleryId === 'random' && method === 'GET') {
+    try {
+      const lim = parseInt(limit) || 6;
+      const randomGalleries = await Gallery.aggregate([{ $sample: { size: lim } }]);
+      return res.status(200).json(randomGalleries);
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
 
   if (!galleryId) {
     switch (method) {

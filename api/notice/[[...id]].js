@@ -1,4 +1,4 @@
-import dbConnect from '../_db';
+import dbConnect from '../_db.js';
 import Notice from '../models/noticemodel';
 import { verifyAdmin } from '../Middlewares/Auth';
 

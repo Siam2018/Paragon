@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-const BACKEND_URL = import.meta.env.VITE_HTTPURLBackend;
-
 const GallerySection = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +12,7 @@ const GallerySection = () => {
   const fetchRandomImages = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${BACKEND_URL}/gallery/random?limit=6`);
+      const response = await fetch(`/api/gallery/random?limit=6`);
       const data = await response.json();
       
       if (data.success) {
@@ -64,7 +62,7 @@ const GallerySection = () => {
             images.map((image, index) => (
               <div key={image._id || index} className="bg-gray-200 h-48 sm:h-56 lg:h-64 rounded-lg overflow-hidden group shadow-md hover:shadow-lg transition-shadow duration-300">
                 <img 
-                  src={`${BACKEND_URL}/uploads/gallery/${image.imageURL}`} 
+                  src={`/uploads/gallery/${image.imageURL}`} 
                   alt={`Gallery image ${index + 1}`}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 group-hover:scale-110" 
                   onError={(e) => {
