@@ -39,6 +39,7 @@ const studentSchema = mongoose.Schema({
         },
         GuardianContactNumber:{
             type: String,
+            required: true,
         },
         // Address Information
         PresentAddress:{
@@ -160,4 +161,5 @@ const studentSchema = mongoose.Schema({
     }
 );
 
-export const Student = mongoose.model('Student', studentSchema);
+const Student = mongoose.model("Student", studentSchema);
+export default Student;

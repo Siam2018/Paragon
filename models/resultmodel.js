@@ -11,4 +11,5 @@ const resultSchema = mongoose.Schema({
 
 );
 
-export const Result = mongoose.model("Result", resultSchema);
+const Result = mongoose.model("Result", resultSchema);
+export default Result;
