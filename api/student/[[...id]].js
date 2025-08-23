@@ -1,4 +1,4 @@
-import dbConnect from '../_db.js';
+import { dbConnect } from '../_db.js';
 import Student from '../../models/studentmodel.js';
 import { verifyAdmin } from '../../Middlewares/Auth.js';
 
