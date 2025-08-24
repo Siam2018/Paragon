@@ -4,13 +4,21 @@ import { verifyAdmin } from '../Middlewares/Auth.js';
 
 export default async function handler(req, res) {
   await dbConnect();
-  const { method, query, body } = req;
-  const { id } = query;
+  const { method, query, body, url } = req;
+  let { id } = query;
+
+  // Support /api/result/123 as well as /api/result?id=123
+  let pathId = null;
+  const match = url.match(/\/api\/result\/?([^/?#]+)/);
+  if (match && match[1] && match[1] !== 'result') {
+    pathId = match[1];
+  }
+  const resultId = pathId || id;
 
   if (method === 'GET') {
     try {
-      if (id) {
-        const result = await Result.findById(id);
+      if (resultId) {
+        const result = await Result.findById(resultId);
         if (!result) return res.status(404).json({ message: 'Result not found' });
         return res.status(200).json(result);
       } else {
@@ -34,8 +42,8 @@ export default async function handler(req, res) {
   if (method === 'PUT') {
     try {
       await verifyAdmin(req, res);
-      if (!id) return res.status(400).json({ message: 'ID required' });
-      const updated = await Result.findByIdAndUpdate(id, body, { new: true });
+      if (!resultId) return res.status(400).json({ message: 'ID required' });
+      const updated = await Result.findByIdAndUpdate(resultId, body, { new: true });
       if (!updated) return res.status(404).json({ message: 'Result not found' });
       return res.status(200).json(updated);
     } catch (error) {
@@ -45,8 +53,8 @@ export default async function handler(req, res) {
   if (method === 'DELETE') {
     try {
       await verifyAdmin(req, res);
-      if (!id) return res.status(400).json({ message: 'ID required' });
-      const deleted = await Result.findByIdAndDelete(id);
+      if (!resultId) return res.status(400).json({ message: 'ID required' });
+      const deleted = await Result.findByIdAndDelete(resultId);
       if (!deleted) return res.status(404).json({ message: 'Result not found' });
       return res.status(200).json({ message: 'Result deleted' });
     } catch (error) {
