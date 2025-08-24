@@ -34,43 +34,32 @@ const AdminSignIn = () => {
       return;
     }
     try {
-  const response = await fetch(`/api/auth/Admin/Signin`, {
+      const response = await fetch(`/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-            body: JSON.stringify({
-              Email: signInInfo.email,
-              Password: signInInfo.password,
-            }),
+        body: JSON.stringify({
+          Email: signInInfo.email,
+          Password: signInInfo.password,
+        }),
       });
       const result = await response.json();
-      const { token, admin } = result;
-      if (response.ok) {
+      const { token, user } = result;
+      if (response.ok && user && user.role === 'admin') {
         toast.success('Sign-in successful!', {
           position: 'top-right',
           autoClose: 5000
         });
         localStorage.setItem('jwtToken', token);
-        localStorage.setItem('admin', JSON.stringify(admin));
+        localStorage.setItem('admin', JSON.stringify(user));
         localStorage.setItem('isAdmin', 'true');
         localStorage.setItem('userType', 'admin');
         setTimeout(() => {
           navigate('/AdminHome');
         }, 2000);
-      } else if (result.message === 'Admin does not exist.') {
-        toast.error('Admin does not exist!', {
-          position: 'top-right',
-          autoClose: 5000
-        });
-      } else if (result.message === 'Incorrect password.') {
-        toast.error('Incorrect password!', {
-          position: 'top-right',
-          autoClose: 5000
-        });
-      } else if (result.error) {
-        const errorMessage = result.error?.details?.[0]?.message || 'Sign-in failed!';
-        toast.error(errorMessage, {
+      } else if (user && user.role !== 'admin') {
+        toast.error('Not an admin account!', {
           position: 'top-right',
           autoClose: 5000
         });

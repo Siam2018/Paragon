@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { dbConnect } from './_db.js';
 import AdminModel from '../models/adminmodel.js';
+import Student from '../models/studentmodel.js';
+import Student from '../models/studentmodel.js';
 
 const adminRegisterValidation = (body) => {
   const schema = Joi.object({
@@ -59,6 +61,34 @@ export default async function handler(req, res) {
       if (!admin || !isPasswordValid) return res.status(401).json({ message: 'Invalid email or password.' });
       const token = jwt.sign({ id: admin._id, Email: admin.Email }, process.env.JWT_SECRET, { expiresIn: '12h' });
       return res.status(200).json({ token, admin: { FullName: admin.FullName, Email: admin.Email } });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  } else if (method === 'POST' && (action === 'login' || url.endsWith('/login'))) {
+    // Unified login for admin or student
+    const { Email, Password } = body;
+    if (!Email || !Password) return res.status(400).json({ message: 'Email and password are required.' });
+    try {
+      // Try admin first
+      const admin = await AdminModel.findOne({ Email });
+      if (admin) {
+        const isPasswordValid = await bcrypt.compare(Password, admin.Password);
+        if (!isPasswordValid) return res.status(401).json({ message: 'Invalid email or password.' });
+        const token = jwt.sign({ id: admin._id, Email: admin.Email, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '12h' });
+        return res.status(200).json({ token, user: { role: 'admin', FullName: admin.FullName, Email: admin.Email } });
+      }
+      // Try student
+      const student = await Student.findOne({ Email });
+      if (student) {
+        // If you store hashed passwords for students, use bcrypt.compare. If plain text, use ===
+        const isPasswordValid = student.Password
+          ? await bcrypt.compare(Password, student.Password)
+          : false;
+        if (!isPasswordValid) return res.status(401).json({ message: 'Invalid email or password.' });
+        const token = jwt.sign({ id: student._id, Email: student.Email, role: 'student' }, process.env.JWT_SECRET, { expiresIn: '12h' });
+        return res.status(200).json({ token, user: { role: 'student', FullName: student.EnglishName, Email: student.Email } });
+      }
+      return res.status(401).json({ message: 'Invalid email or password.' });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }

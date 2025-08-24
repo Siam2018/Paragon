@@ -27,7 +27,8 @@ const StudentLogin = () => {
         setError(null);
 
         try {
-            const response = await fetch(`/api/admin/Student/login`, {
+
+            const response = await fetch(`/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -35,16 +36,15 @@ const StudentLogin = () => {
                 body: JSON.stringify(formData),
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Login failed');
-            }
-
             const data = await response.json();
+
+            if (!response.ok || !data.user || data.user.role !== 'student') {
+                throw new Error(data.message || 'Login failed');
+            }
 
             // Store JWT token and student data in localStorage
             localStorage.setItem('studentToken', data.token);
-            localStorage.setItem('studentData', JSON.stringify(data.student));
+            localStorage.setItem('studentData', JSON.stringify(data.user));
             localStorage.setItem('userType', 'student');
 
             toast.success('Login successful!', {
@@ -55,7 +55,6 @@ const StudentLogin = () => {
             // Navigate to home page or dashboard
             setTimeout(() => {
                 navigate('/');
-                // Reload the page to update navbar
                 window.location.reload();
             }, 1500);
 
