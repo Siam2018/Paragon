@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import bcrypt from 'bcryptjs';
-import { dbConnect } from '../_db.js';
-import { Student } from '../models/studentmodel.js';
+import { dbConnect } from './_db.js';
+import Student from '../models/studentmodel.js';
 
 const verificationCodes = new Map();
 const passwordResetCodes = new Map();
@@ -17,11 +17,17 @@ const createTransporter = () => nodemailer.createTransport({
 
 export default async function handler(req, res) {
   await dbConnect();
-  const { id = [] } = req.query;
-  const action = Array.isArray(id) ? id.join('/') : id;
+  const { method, query, body, url } = req;
+  let { id } = query;
+  let action = id;
+  // Support /api/email/send-verification-email and /api/email?id=send-verification-email
+  const match = url.match(/\/api\/email\/?([^/?#]+)/);
+  if (match && match[1] && match[1] !== 'email') {
+    action = match[1];
+  }
 
-  if (req.method === 'POST' && (action === 'send-verification-email' || req.url.endsWith('/send-verification-email'))) {
-    const { email } = req.body;
+  if (method === 'POST' && (action === 'send-verification-email' || url.endsWith('/send-verification-email'))) {
+    const { email } = body;
     if (!email) return res.status(400).json({ message: 'Email is required' });
     if (!isValidEmail(email)) return res.status(400).json({ message: 'Please enter a valid email address' });
     const existingStudent = await Student.findOne({ Email: email });
@@ -38,8 +44,8 @@ export default async function handler(req, res) {
     await transporter.sendMail(mailOptions);
     return res.status(200).json({ message: 'Verification email sent successfully', email });
   }
-  else if (req.method === 'POST' && (action === 'verify-email-code' || req.url.endsWith('/verify-email-code'))) {
-    const { email, code } = req.body;
+  else if (method === 'POST' && (action === 'verify-email-code' || url.endsWith('/verify-email-code'))) {
+    const { email, code } = body;
     if (!email || !code) return res.status(400).json({ message: 'Email and code are required' });
     const storedData = verificationCodes.get(email);
     if (!storedData) return res.status(400).json({ message: 'No verification code found for this email' });
@@ -51,8 +57,8 @@ export default async function handler(req, res) {
     verificationCodes.delete(email);
     return res.status(200).json({ message: 'Email verified successfully', verified: true });
   }
-  else if (req.method === 'POST' && (action === 'send-password-reset-email' || req.url.endsWith('/send-password-reset-email'))) {
-    const { email } = req.body;
+  else if (method === 'POST' && (action === 'send-password-reset-email' || url.endsWith('/send-password-reset-email'))) {
+    const { email } = body;
     if (!email) return res.status(400).json({ message: 'Email is required' });
     if (!isValidEmail(email)) return res.status(400).json({ message: 'Please enter a valid email address' });
     const student = await Student.findOne({ Email: email });
@@ -69,8 +75,8 @@ export default async function handler(req, res) {
     await transporter.sendMail(mailOptions);
     return res.status(200).json({ message: 'Password reset email sent successfully', email });
   }
-  else if (req.method === 'POST' && (action === 'reset-password' || req.url.endsWith('/reset-password'))) {
-    const { email, code, newPassword } = req.body;
+  else if (method === 'POST' && (action === 'reset-password' || url.endsWith('/reset-password'))) {
+    const { email, code, newPassword } = body;
     if (!email || !code || !newPassword) return res.status(400).json({ message: 'Email, code, and new password are required' });
     if (newPassword.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters long' });
     const storedData = passwordResetCodes.get(email);
@@ -81,12 +87,12 @@ export default async function handler(req, res) {
     }
     if (storedData.code !== code) return res.status(400).json({ message: 'Invalid password reset code' });
     const student = await Student.findOne({ Email: email });
-    if (!student) return res.status(404).json({ message: 'Student not found' });
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
-    await Student.findByIdAndUpdate(student._id, { Password: hashedPassword });
+    if (!student) return res.status(404).json({ message: 'No account found with this email address' });
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    student.Password = hashedPassword;
+    await student.save();
     passwordResetCodes.delete(email);
-    return res.status(200).json({ message: 'Password reset successfully', success: true });
+    return res.status(200).json({ message: 'Password reset successfully' });
   }
   else {
     res.status(404).json({ message: 'Not found' });

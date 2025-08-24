@@ -1,7 +1,7 @@
 import Joi from 'joi';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { dbConnect } from '../_db.js';
+import { dbConnect } from './_db.js';
 import AdminModel from '../models/adminmodel.js';
 
 const adminRegisterValidation = (body) => {
@@ -23,14 +23,20 @@ const adminSigninValidation = (body) => {
 
 export default async function handler(req, res) {
   await dbConnect();
-  const { id = [] } = req.query;
-  const action = Array.isArray(id) ? id.join('/') : id;
+  const { method, query, body, url } = req;
+  let { id } = query;
+  let action = id;
+  // Support /api/auth/Admin/Register and /api/auth?id=Admin/Register
+  const match = url.match(/\/api\/auth\/?([^/?#]+)/);
+  if (match && match[1] && match[1] !== 'auth') {
+    action = match[1];
+  }
 
-  if (req.method === 'POST' && (action === 'Admin/Register' || req.url.endsWith('/Admin/Register'))) {
+  if (method === 'POST' && (action === 'Admin/Register' || url.endsWith('/Admin/Register'))) {
     // Register
-    const { error } = adminRegisterValidation(req.body);
+    const { error } = adminRegisterValidation(body);
     if (error) return res.status(400).json({ message: error.message });
-    const { FullName, Email, Password } = req.body;
+    const { FullName, Email, Password } = body;
     try {
       const existingAdmin = await AdminModel.findOne({ Email });
       if (existingAdmin) return res.status(409).json({ message: 'Admin already exists.' });
@@ -42,11 +48,11 @@ export default async function handler(req, res) {
     } catch (error) {
       return res.status(500).json({ message: 'Internal server error' });
     }
-  } else if (req.method === 'POST' && (action === 'Admin/Signin' || req.url.endsWith('/Admin/Signin'))) {
+  } else if (method === 'POST' && (action === 'Admin/Signin' || url.endsWith('/Admin/Signin'))) {
     // Signin
-    const { error } = adminSigninValidation(req.body);
+    const { error } = adminSigninValidation(body);
     if (error) return res.status(400).json({ message: error.message });
-    const { Email, Password } = req.body;
+    const { Email, Password } = body;
     try {
       const admin = await AdminModel.findOne({ Email });
       const isPasswordValid = admin ? await bcrypt.compare(Password, admin.Password) : false;
