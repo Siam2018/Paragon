@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useEffect, useRef } from 'react'
 import ParagonLogo from '../assets/ParagonLogo2.png'
 import { Menu, X, User, LogOut } from 'lucide-react';

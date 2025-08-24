@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import ParagonHero from '../assets/1.png'
 import NoticeHero from '../assets/2.png'
 import ResultHero from '../assets/3.png'
