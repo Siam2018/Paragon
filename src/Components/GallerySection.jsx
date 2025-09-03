@@ -1,15 +1,32 @@
+import React, { useState, useEffect } from 'react';
 
 const GallerySection = () => {
-  const images = [
-  { imageURL: '../assets/Gallery/1.jpeg', title: 'Title 1', alt: 'Alt text 1' },
-  { imageURL: '../assets/Gallery/2.jpeg', title: 'Title 2', alt: 'Alt text 2' },
-  { imageURL: '../assets/Gallery/3.jpeg', title: 'Title 3', alt: 'Alt text 3' },
-  { imageURL: '../assets/Gallery/4.jpeg', title: 'Title 4', alt: 'Alt text 4' },
-  { imageURL: '../assets/Gallery/5.jpeg', title: 'Title 5', alt: 'Alt text 5' },
-  { imageURL: '../assets/Gallery/6.jpeg', title: 'Title 6', alt: 'Alt text 6' },
-];
-  const loading = false;
-  const error = null;
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchRandomImages();
+  }, []);
+
+  const fetchRandomImages = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/gallery/random?limit=6`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setImages(data.data);
+      } else {
+        setError('Failed to load gallery images');
+      }
+    } catch (error) {
+      console.error('Error fetching gallery images:', error);
+      setError('Error loading gallery images');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Fallback placeholder images if no images are available
   const placeholderImages = [

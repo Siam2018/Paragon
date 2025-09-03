@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 import { dbConnect } from './_db.js';
 import AdminModel from '../models/adminmodel.js';
 import Student from '../models/studentmodel.js';
-import Student from '../models/studentmodel.js';
 
 const adminRegisterValidation = (body) => {
   const schema = Joi.object({
