@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   }
 
   // ...existing code...
-
+}
 const verificationCodes = new Map();
 const passwordResetCodes = new Map();
 
@@ -107,3 +107,4 @@ export default async function handler(req, res) {
     res.status(404).json({ message: 'Not found' });
   }
 
+}
