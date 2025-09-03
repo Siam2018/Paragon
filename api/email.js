@@ -1,3 +1,4 @@
+
 import nodemailer from 'nodemailer';
 import bcrypt from 'bcryptjs';
 import { dbConnect } from './_db.js';
@@ -6,33 +7,37 @@ import Student from '../models/studentmodel.js';
 const verificationCodes = new Map();
 const passwordResetCodes = new Map();
 
-const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-const createTransporter = () => nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-  tls: { rejectUnauthorized: false }
-});
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+// End of file
+
+function createTransporter() {
+  return nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+    tls: { rejectUnauthorized: false }
+  });
+}
+
 
 export default async function handler(req, res) {
-  try {
-    await dbConnect();
-    const { method, query, body, url } = req;
-    // Normalize action for both /api/email and /api/email/*
-    let action = query.id;
-    if (Array.isArray(query.action)) {
-      action = query.action.join('/');
-    } else if (typeof query.action === 'string') {
-      action = query.action;
-    }
-    // Support /api/email/send-verification-email and /api/email?id=send-verification-email
-    const match = url.match(/\/api\/email\/?([^/?#]+)/);
-    if (match && match[1] && match[1] !== 'email') {
-      action = match[1];
-    }
+  await dbConnect();
+  const { method, query, body, url } = req;
+  // Normalize action for both /api/email and /api/email/*
+  let action = query.id;
+  if (Array.isArray(query.action)) {
+    action = query.action.join('/');
+  } else if (typeof query.action === 'string') {
+    action = query.action;
+  }
+  const match = url.match(/\/api\/email\/?([^/?#]+)/);
+  if (match && match[1] && match[1] !== 'email') {
+    action = match[1];
+  }
 
-    // ...existing code for handling actions...
+  try {
     if (method === 'POST' && (action === 'send-verification-email' || url.endsWith('/send-verification-email'))) {
       const { email } = body;
       if (!email) return res.status(400).json({ message: 'Email is required' });
@@ -104,10 +109,10 @@ export default async function handler(req, res) {
     else {
       res.status(404).json({ message: 'Not found' });
     }
-  } catch (err) {
-    console.error('API Error:', err);
-    res.status(500).json({ message: 'Internal server error', error: err.message });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
+}
 
   if (method === 'POST' && (action === 'send-verification-email' || url.endsWith('/send-verification-email'))) {
     const { email } = body;
