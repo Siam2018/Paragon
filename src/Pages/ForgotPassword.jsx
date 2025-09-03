@@ -27,7 +27,7 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-  const response = await fetch(`/api/send-password-reset-email`, {
+  const response = await fetch(`/api/email/send-password-reset-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/admin/reset-password`, {
+  const response = await fetch(`/api/email/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

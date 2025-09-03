@@ -3,6 +3,25 @@ import bcrypt from 'bcryptjs';
 import { dbConnect } from './_db.js';
 import Student from '../models/studentmodel.js';
 
+// Catch-all route support for Vercel: handle /api/email/* and /api/email
+export default async function handler(req, res) {
+  // If this is a catch-all route, patch the url for internal routing
+  if (Array.isArray(req.query?.action)) {
+    req.url = `/api/email/${req.query.action.join('/')}`;
+  }
+
+  await dbConnect();
+  const { method, query, body, url } = req;
+  let { id } = query;
+  let action = id;
+  // Support /api/email/send-verification-email and /api/email?id=send-verification-email
+  const match = url.match(/\/api\/email\/?([^/?#]+)/);
+  if (match && match[1] && match[1] !== 'email') {
+    action = match[1];
+  }
+
+  // ...existing code...
+
 const verificationCodes = new Map();
 const passwordResetCodes = new Map();
 
@@ -16,16 +35,6 @@ const createTransporter = () => nodemailer.createTransport({
 });
 
 export default async function handler(req, res) {
-  await dbConnect();
-  const { method, query, body, url } = req;
-  let { id } = query;
-  let action = id;
-  // Support /api/email/send-verification-email and /api/email?id=send-verification-email
-  const match = url.match(/\/api\/email\/?([^/?#]+)/);
-  if (match && match[1] && match[1] !== 'email') {
-    action = match[1];
-  }
-
   if (method === 'POST' && (action === 'send-verification-email' || url.endsWith('/send-verification-email'))) {
     const { email } = body;
     if (!email) return res.status(400).json({ message: 'Email is required' });
@@ -97,4 +106,4 @@ export default async function handler(req, res) {
   else {
     res.status(404).json({ message: 'Not found' });
   }
-}
+
