@@ -1,3 +1,6 @@
+// Debug: Log env variables to Vercel logs
+console.log('JWT_SECRET:', process.env.JWT_SECRET);
+console.log('mongoDBURL:', process.env.mongoDBURL);
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { dbConnect } from './_db.js';
