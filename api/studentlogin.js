@@ -21,12 +21,16 @@ export default async function handler(req, res) {
 
   try {
     const student = await Student.findOne({ Email });
+    console.log('Student lookup result:', student);
     if (!student) {
+      console.log('No student found for email:', Email);
       return res.status(401).json({ message: 'Invalid email or password.' });
     }
+    console.log('Student password in DB:', student.Password);
     const isPasswordValid = student.Password
       ? await bcrypt.compare(Password, student.Password)
       : false;
+    console.log('Password valid:', isPasswordValid);
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Invalid email or password.' });
     }
