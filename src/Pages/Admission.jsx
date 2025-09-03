@@ -237,7 +237,7 @@ const Admission = () => {
     setEmailVerification(prev => ({ ...prev, loading: true }));
 
     try {
-      const response = await fetch(`/api/admin/send-verification-email`, {
+  const response = await fetch(`/api/email/send-verification-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
