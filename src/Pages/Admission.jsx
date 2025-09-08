@@ -242,9 +242,23 @@ const Admission = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  // Only browser validation
-  navigate('/verify-email', { state: { email: formData.Email } });
+    e.preventDefault();
+    // Send verification email
+    try {
+      const response = await fetch('/api/sendVerificationEmail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.Email })
+      });
+      if (response.ok) {
+        // Navigate to waiting page
+        navigate('/verify-email', { state: { email: formData.Email } });
+      } else {
+        alert('Failed to send verification email.');
+      }
+    } catch (error) {
+      alert('Error sending verification email.');
+    }
   }
 
   // Error display component
@@ -337,7 +351,15 @@ const Admission = () => {
               </div>
               <div>
                 <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Profile Picture <span style={{color:'red'}}>*</span></label>
-                <input type="file" accept="image/*" onChange={handlePhotoSelect} required className="block w-full text-xs sm:text-sm text-gray-500" />
+                <label htmlFor="profilePictureUpload" className="inline-block px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow hover:bg-blue-700 cursor-pointer">
+                  Upload Profile Picture
+                </label>
+                <input id="profilePictureUpload" type="file" accept="image/*" onChange={handlePhotoSelect} required className="hidden" />
+                {photoPreview && (
+                  <div className="mt-2">
+                    <img src={photoPreview} alt="Preview" className="w-24 h-24 rounded-full object-cover border-2 border-blue-300" />
+                  </div>
+                )}
               </div>
             </div>
             {/* Contact Information Section */}

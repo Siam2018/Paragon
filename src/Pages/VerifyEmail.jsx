@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../Components/Navbar.jsx';
 
 const VerifyEmail = () => {
   const [verified, setVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const email = location.state?.email;
 
   useEffect(() => {
     // Check for token in URL
@@ -32,7 +34,8 @@ const VerifyEmail = () => {
         <h2 className="text-2xl font-bold mb-4">Verify Your Email</h2>
         {!verified ? (
           <>
-            <p className="mb-6">Please check your inbox and click the verification link we sent to your email address.</p>
+            <p className="mb-6">You have been sent an email. Please check your inbox at <span className="font-semibold">{email}</span> and click the verification link.</p>
+            <p className="mt-4 text-gray-500">Waiting for you to verify...</p>
             {loading && <p className="text-blue-500">Verifying...</p>}
           </>
         ) : (
