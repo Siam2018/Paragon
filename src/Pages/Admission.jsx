@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../Components/Navbar.jsx';
 import paragonlogo from '../assets/ParagonLogo2-Photoroom2.png';
 import { ToastContainer, toast } from 'react-toastify';
@@ -8,6 +8,7 @@ import { ToastContainer, toast } from 'react-toastify';
 
 
 const Admission = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     // Personal Information
     BanglaName: '',
@@ -265,129 +266,16 @@ const Admission = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
-
-    // Validate form
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
       scrollToFirstError(errors);
-      
-      // Show toast for first error
-      const firstErrorMessage = Object.values(errors)[0];
-      toast.error(firstErrorMessage, {
-        position: 'top-right',
-        autoClose: 5000
-      });
-      
-      setLoading(false);
       return;
     }
-
-    try {
-      const response = await fetch(`/api/admin/Student/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Registration failed');
-      }
-
-      const data = await response.json();
-      setSuccess(true);
-      
-      toast.success('Registration successful! Welcome to Paragon Coaching Center!', {
-        position: 'top-right',
-        autoClose: 5000
-      });
-
-      // If photo was selected, upload it
-      if (selectedPhoto && data._id) {
-        try {
-          const photoFormData = new FormData();
-          photoFormData.append('Image', selectedPhoto);
-
-          await fetch(`/api/admin/Student/photo/${data._id}`, {
-            method: 'PUT',
-            body: photoFormData,
-          });
-        } catch (photoError) {
-          console.error('Photo upload failed:', photoError);
-          // Don't show error for photo upload failure during registration
-        }
-      }
-
-      // Reset form
-      setFormData({
-        // Personal Information
-        BanglaName: '',
-        EnglishName: '',
-        FatherName: '',
-        MotherName: '',
-        DateOfBirth: '',
-        Gender: '',
-
-        // Contact Information
-        ContactNumber: '',
-        GuardianContactNumber: '',
-        Email: '',
-        Password: '',
-
-        // Address Information
-        PresentAddress: '',
-        PermanentAddress: '',
-
-        // Educational Information (SSC)
-        SchoolName: '',
-        SSCBoard: '',
-        SSCGroup: '',
-        SSCYearPass: '',
-        SSCGPA: '',
-        SSCGrade: '',
-        SSCRollNumber: '',
-        SSCRegistrationNumber: '',
-
-        // Educational Information (HSC)
-        CollegeName: '',
-        HSCBoard: '',
-        HSCGroup: '',
-        HSCYearPass: '',
-        HSCGPA: '',
-        HSCGrade: '',
-        HSCRollNumber: '',
-        HSCRegistrationNumber: '',
-
-        // Course Selection
-        SelectedCourse: '',
-        BranchName: '',
-
-        // Terms
-        TermsAccepted: false
-      });
-      setSelectedPhoto(null);
-      setPhotoPreview(null);
-      setEmailVerification({
-        sent: false,
-        verified: false,
-        loading: false
-      });
-
-    } catch (err) {
-      toast.error(err.message, {
-        position: 'top-right',
-        autoClose: 5000
-      });
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    // All required fields are filled, go to verify email page
+    navigate('/verify-email', { state: { email: formData.Email } });
+  }
 
   // Error display component
   const ErrorMessage = ({ error }) => {
@@ -1084,23 +972,9 @@ const Admission = () => {
                       style={{ focusRingColor: '#0088ce' }}
                       disabled={emailVerification.verified}
                     />
-                    {!emailVerification.verified && (
-                      <button
-                        type="button"
-                        onClick={sendVerificationEmail}
-                        disabled={emailVerification.loading || !formData.Email}
-                        className="px-3 sm:px-4 py-2 text-xs sm:text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 whitespace-nowrap"
-                      >
-                        {emailVerification.loading ? 'Sending...' : emailVerification.sent ? 'Resend' : 'Verify'}
-                      </button>
-                    )}
+                    {/* Verify button removed as requested */}
                     {emailVerification.verified && (
-                      <div className="flex items-center px-3 py-2 bg-green-100 text-green-700 rounded-md">
-                        <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span className="text-xs sm:text-sm">Verified</span>
-                      </div>
+                      <span className="text-xs sm:text-sm text-green-600 ml-2">Verified</span>
                     )}
                   </div>
                   <ErrorMessage error={validationErrors.Email} />
@@ -1154,11 +1028,10 @@ const Admission = () => {
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full py-3 sm:py-4 px-4 text-sm sm:text-base text-white font-medium rounded-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
-              style={{ backgroundColor: '#0088ce' }}
+              disabled={Object.keys(validateForm()).length > 0}
+              className={`w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ${Object.keys(validateForm()).length > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              {loading ? 'Registering...' : 'Register Student'}
+              Next
             </button>
           </form>
         </div>
