@@ -8,27 +8,18 @@ import { ToastContainer, toast } from 'react-toastify';
 
 
 const Admission = () => {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    // Personal Information
     BanglaName: '',
     EnglishName: '',
     FatherName: '',
     MotherName: '',
     DateOfBirth: '',
     Gender: '',
-
-    // Contact Information
+    ProfilePicture: '',
     ContactNumber: '',
     GuardianContactNumber: '',
-    Email: '',
-    Password: '',
-
-    // Address Information
     PresentAddress: '',
     PermanentAddress: '',
-
-    // Educational Information (SSC)
     SchoolName: '',
     SSCBoard: '',
     SSCGroup: '',
@@ -37,8 +28,6 @@ const Admission = () => {
     SSCGrade: '',
     SSCRollNumber: '',
     SSCRegistrationNumber: '',
-
-    // Educational Information (HSC)
     CollegeName: '',
     HSCBoard: '',
     HSCGroup: '',
@@ -47,14 +36,13 @@ const Admission = () => {
     HSCGrade: '',
     HSCRollNumber: '',
     HSCRegistrationNumber: '',
-
-    // Course Selection
     SelectedCourse: '',
     BranchName: '',
-
-    // Terms
+    Email: '',
+    Password: '',
     TermsAccepted: false
   });
+  const navigate = useNavigate();
 
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
@@ -62,19 +50,18 @@ const Admission = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [emailVerification, setEmailVerification] = useState({
-    sent: false,
     verified: false,
     loading: false
   });
   const [validationErrors, setValidationErrors] = useState({});
+  const [formError, setFormError] = useState("");
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, type, checked, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    
     // Clear validation error when user starts typing
     if (validationErrors[name]) {
       setValidationErrors(prev => ({
@@ -83,10 +70,9 @@ const Admission = () => {
       }));
     }
   };
-
+  // Validation logic moved to its own function
   const validateForm = () => {
     const errors = {};
-    
     // Personal Information
     if (!formData.BanglaName.trim()) {
       errors.BanglaName = 'Bangla name is required';
@@ -106,7 +92,6 @@ const Admission = () => {
     if (!formData.Gender) {
       errors.Gender = 'Gender is required';
     }
-
     // Contact Information
     if (!formData.ContactNumber.trim()) {
       errors.ContactNumber = 'Contact number is required';
@@ -121,7 +106,6 @@ const Admission = () => {
     } else if (formData.Password.length < 6) {
       errors.Password = 'Password must be at least 6 characters long';
     }
-
     // Address Information
     if (!formData.PresentAddress.trim()) {
       errors.PresentAddress = 'Present address is required';
@@ -129,7 +113,6 @@ const Admission = () => {
     if (!formData.PermanentAddress.trim()) {
       errors.PermanentAddress = 'Permanent address is required';
     }
-
     // SSC Information
     if (!formData.SchoolName.trim()) {
       errors.SchoolName = 'School name is required';
@@ -155,7 +138,6 @@ const Admission = () => {
     if (!formData.SSCRegistrationNumber.trim()) {
       errors.SSCRegistrationNumber = 'SSC registration number is required';
     }
-
     // HSC Information
     if (!formData.CollegeName.trim()) {
       errors.CollegeName = 'College name is required';
@@ -169,7 +151,6 @@ const Admission = () => {
     if (!formData.HSCRollNumber.trim()) {
       errors.HSCRollNumber = 'HSC roll number is required';
     }
-
     // Course Information
     if (!formData.SelectedCourse.trim()) {
       errors.SelectedCourse = 'Selected course is required';
@@ -177,17 +158,14 @@ const Admission = () => {
     if (!formData.BranchName.trim()) {
       errors.BranchName = 'Branch name is required';
     }
-
     // Terms and Conditions
     if (!formData.TermsAccepted) {
       errors.TermsAccepted = 'You must accept the terms and conditions';
     }
-
     // Email Verification
     if (!emailVerification.verified) {
       errors.emailVerification = 'Please verify your email address first';
     }
-
     return errors;
   };
 
@@ -196,13 +174,12 @@ const Admission = () => {
     const element = document.querySelector(`[name="${firstErrorField}"]`) || 
                     document.querySelector(`#${firstErrorField}`) ||
                     document.querySelector('.error-section');
-    
     if (element) {
       element.scrollIntoView({ 
         behavior: 'smooth', 
         block: 'center' 
       });
-      element.focus();
+      // Removed element.focus() so all errors are visible
     }
   };
 
@@ -265,30 +242,13 @@ const Admission = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-    const errors = validateForm();
-    if (Object.keys(errors).length > 0) {
-      setValidationErrors(errors);
-      scrollToFirstError(errors);
-      return;
-    }
-    // All required fields are filled, go to verify email page
-    navigate('/verify-email', { state: { email: formData.Email } });
+  e.preventDefault();
+  // Only browser validation
+  navigate('/verify-email', { state: { email: formData.Email } });
   }
 
   // Error display component
-  const ErrorMessage = ({ error }) => {
-    if (!error) return null;
-    return (
-      <p className="text-red-500 text-sm mt-1 flex items-center">
-        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-        </svg>
-        {error}
-      </p>
-    );
-  };
+  // ...existing code...
 
   if (success) {
     return (
@@ -321,7 +281,7 @@ const Admission = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+  <div className="min-h-screen bg-gray-50">
       <Navbar />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12">
@@ -343,696 +303,202 @@ const Admission = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-            {/* Email Verification Error */}
-            {validationErrors.emailVerification && (
-              <div className="p-3 sm:p-4 bg-red-100 border border-red-400 text-red-700 rounded flex items-center text-sm sm:text-base">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-                {validationErrors.emailVerification}
-              </div>
-            )}
-
             {/* Personal Information Section */}
-            <div>
-              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: '#0088ce' }}>
-                Personal Information
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Name in Bangla
-                  </label>
-                  <input
-                    type="text"
-                    name="BanglaName"
-                    value={formData.BanglaName}
-                    onChange={handleChange}
-                    required
-                    className={`w-full px-3 py-2 text-sm sm:text-base border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ${
-                      validationErrors.BanglaName ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                  <ErrorMessage error={validationErrors.BanglaName} />
-                </div>
-
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Name in English
-                  </label>
-                  <input
-                    type="text"
-                    name="EnglishName"
-                    value={formData.EnglishName}
-                    onChange={handleChange}
-                    required
-                    className={`w-full px-3 py-2 text-sm sm:text-base border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ${
-                      validationErrors.EnglishName ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                  <ErrorMessage error={validationErrors.EnglishName} />
-                </div>
-
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Father's Name (Bangla)
-                  </label>
-                  <input
-                    type="text"
-                    name="FatherName"
-                    value={formData.FatherName}
-                    onChange={handleChange}
-                    required
-                    className={`w-full px-3 py-2 text-sm sm:text-base border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ${
-                      validationErrors.FatherName ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                  <ErrorMessage error={validationErrors.FatherName} />
-                </div>
-
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Mother's Name (Bangla)
-                  </label>
-                  <input
-                    type="text"
-                    name="MotherName"
-                    value={formData.MotherName}
-                    onChange={handleChange}
-                    required
-                    className={`w-full px-3 py-2 text-sm sm:text-base border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ${
-                      validationErrors.MotherName ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                  <ErrorMessage error={validationErrors.MotherName} />
-                </div>
-
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Date of Birth
-                  </label>
-                  <input
-                    type="date"
-                    name="DateOfBirth"
-                    value={formData.DateOfBirth}
-                    onChange={handleChange}
-                    required
-                    className={`w-full px-3 py-2 text-sm sm:text-base border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ${
-                      validationErrors.DateOfBirth ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                  <ErrorMessage error={validationErrors.DateOfBirth} />
-                </div>
-
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Gender
-                  </label>
-                  <select
-                    name="Gender"
-                    value={formData.Gender}
-                    onChange={handleChange}
-                    required
-                    className={`w-full px-3 py-2 text-sm sm:text-base border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ${
-                      validationErrors.Gender ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    style={{ focusRingColor: '#0088ce' }}
-                  >
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                  </select>
-                  <ErrorMessage error={validationErrors.Gender} />
-                </div>
+            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: '#0088ce' }}>Personal Information</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Name in Bangla <span style={{color:'red'}}>*</span></label>
+                <input type="text" name="BanglaName" value={formData.BanglaName} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Name in English <span style={{color:'red'}}>*</span></label>
+                <input type="text" name="EnglishName" value={formData.EnglishName} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Father's Name <span style={{color:'red'}}>*</span></label>
+                <input type="text" name="FatherName" value={formData.FatherName} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Mother's Name <span style={{color:'red'}}>*</span></label>
+                <input type="text" name="MotherName" value={formData.MotherName} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Date of Birth <span style={{color:'red'}}>*</span></label>
+                <input type="date" name="DateOfBirth" value={formData.DateOfBirth} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Gender <span style={{color:'red'}}>*</span></label>
+                <select name="Gender" value={formData.Gender} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md">
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">Profile Picture <span style={{color:'red'}}>*</span></label>
+                <input type="file" accept="image/*" onChange={handlePhotoSelect} required className="block w-full text-xs sm:text-sm text-gray-500" />
               </div>
             </div>
-            <div>
-              <div className="flex flex-col lg:flex-row items-start space-y-4 lg:space-y-0 lg:space-x-6">
-                <div className="flex-1 w-full">
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                    Select Profile Photo
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoSelect}
-                    className="block w-full text-xs sm:text-sm text-gray-500 file:mr-4 file:py-2 file:px-3 sm:file:px-4 file:rounded-full file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Accepted formats: JPG, PNG, GIF (Max size: 5MB)
-                  </p>
-                </div>
-
-                {/* Photo Preview */}
-                {photoPreview && (
-                  <div className="text-center">
-                    <p className="text-xs sm:text-sm text-gray-600 mb-2">Preview</p>
-                    <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-green-300 mx-auto">
-                      <img
-                        src={photoPreview}
-                        alt="Preview"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
             {/* Contact Information Section */}
-            <div>
-              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: '#0088ce' }}>
-                Contact Information
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Contact Number
-                  </label>
-                  <input
-                    type="tel"
-                    name="ContactNumber"
-                    value={formData.ContactNumber}
-                    onChange={handleChange}
-                    required
-                    className={`w-full px-3 py-2 text-sm sm:text-base border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ${
-                      validationErrors.ContactNumber ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                  <ErrorMessage error={validationErrors.ContactNumber} />
-                </div>
-
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Guardian Contact Number
-                  </label>
-                  <input
-                    type="tel"
-                    name="GuardianContactNumber"
-                    value={formData.GuardianContactNumber}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                </div>
+            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: '#0088ce' }}>Contact Information</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Contact Number <span style={{color:'red'}}>*</span></label>
+                <input type="tel" name="ContactNumber" value={formData.ContactNumber} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Guardian Contact Number <span style={{color:'red'}}>*</span></label>
+                <input type="tel" name="GuardianContactNumber" value={formData.GuardianContactNumber} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
               </div>
             </div>
-
             {/* Address Information Section */}
-            <div>
-              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: '#0088ce' }}>
-                Address Information
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Present Address
-                  </label>
-                  <textarea
-                    name="PresentAddress"
-                    value={formData.PresentAddress}
-                    onChange={handleChange}
-                    required
-                    rows="3"
-                    className={`w-full px-3 py-2 text-sm sm:text-base border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ${
-                      validationErrors.PresentAddress ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                  <ErrorMessage error={validationErrors.PresentAddress} />
-                </div>
-
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Permanent Address
-                  </label>
-                  <textarea
-                    name="PermanentAddress"
-                    value={formData.PermanentAddress}
-                    onChange={handleChange}
-                    required
-                    rows="3"
-                    className={`w-full px-3 py-2 text-sm sm:text-base border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ${
-                      validationErrors.PermanentAddress ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                  <ErrorMessage error={validationErrors.PermanentAddress} />
-                </div>
+            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: '#0088ce' }}>Address Information</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Present Address <span style={{color:'red'}}>*</span></label>
+                <textarea name="PresentAddress" value={formData.PresentAddress} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">Permanent Address <span style={{color:'red'}}>*</span></label>
+                <textarea name="PermanentAddress" value={formData.PermanentAddress} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
               </div>
             </div>
-
-            {/* Educational Information - SSC Section */}
-            <div>
-              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: '#0088ce' }}>
-                Educational Information - SSC
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    School Name
-                  </label>
-                  <input
-                    type="text"
-                    name="SchoolName"
-                    value={formData.SchoolName}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    SSC Board
-                  </label>
-                  <select
-                    name="SSCBoard"
-                    value={formData.SSCBoard}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  >
-                    <option value="">Select Board</option>
-                    <option value="Dhaka">Dhaka</option>
-                    <option value="Chittagong">Chittagong</option>
-                    <option value="Khulna">Khulna</option>
-                    <option value="Rajshahi">Rajshahi</option>
-                    <option value="Barisal">Barisal</option>
-                    <option value="Sylhet">Sylhet</option>
-                    <option value="Rangpur">Rangpur</option>
-                    <option value="Mymensingh">Mymensingh</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    SSC Group
-                  </label>
-                  <select
-                    name="SSCGroup"
-                    value={formData.SSCGroup}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  >
-                    <option value="">Select Group</option>
-                    <option value="Science">Science</option>
-                    <option value="Commerce">Commerce</option>
-                    <option value="Arts">Arts</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    SSC Year of Pass
-                  </label>
-                  <select
-                    name="SSCYearPass"
-                    value={formData.SSCYearPass}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  >
-                    <option value="">Select Year</option>
-                    <option value="2020">2020</option>
-                    <option value="2021">2021</option>
-                    <option value="2022">2022</option>
-                    <option value="2023">2023</option>
-                    <option value="2024">2024</option>
-                    <option value="2025">2025</option>
-                    <option value="2026">2026</option>
-                    <option value="2027">2027</option>
-                    <option value="2028">2028</option>
-                    <option value="2029">2029</option>
-                    <option value="2030">2030</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    SSC GPA
-                  </label>
-                  <input
-                    type="text"
-                    name="SSCGPA"
-                    value={formData.SSCGPA}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    SSC Grade
-                  </label>
-                  <select
-                    name="SSCGrade"
-                    value={formData.SSCGrade}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  >
-                    <option value="">Select Grade</option>
-                    <option value="A+">A+</option>
-                    <option value="A">A</option>
-                    <option value="A-">A-</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    SSC Roll Number
-                  </label>
-                  <input
-                    type="text"
-                    name="SSCRollNumber"
-                    value={formData.SSCRollNumber}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    SSC Registration Number
-                  </label>
-                  <input
-                    type="text"
-                    name="SSCRegistrationNumber"
-                    value={formData.SSCRegistrationNumber}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                </div>
+            {/* SSC Information Section */}
+            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: '#0088ce' }}>Educational Information - SSC</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">School Name <span style={{color:'red'}}>*</span></label>
+                <input type="text" name="SchoolName" value={formData.SchoolName} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">SSC Board <span style={{color:'red'}}>*</span></label>
+                <select name="SSCBoard" value={formData.SSCBoard} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md">
+                  <option value="">Select Board</option>
+                  <option value="Dhaka">Dhaka</option>
+                  <option value="Chittagong">Chittagong</option>
+                  <option value="Khulna">Khulna</option>
+                  <option value="Rajshahi">Rajshahi</option>
+                  <option value="Barisal">Barisal</option>
+                  <option value="Sylhet">Sylhet</option>
+                  <option value="Rangpur">Rangpur</option>
+                  <option value="Mymensingh">Mymensingh</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">SSC Group <span style={{color:'red'}}>*</span></label>
+                <select name="SSCGroup" value={formData.SSCGroup} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md">
+                  <option value="">Select Group</option>
+                  <option value="Science">Science</option>
+                  <option value="Commerce">Commerce</option>
+                  <option value="Arts">Arts</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">SSC Year of Pass <span style={{color:'red'}}>*</span></label>
+                <select name="SSCYearPass" value={formData.SSCYearPass} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md">
+                  <option value="">Select Year</option>
+                  <option value="2020">2020</option>
+                  <option value="2021">2021</option>
+                  <option value="2022">2022</option>
+                  <option value="2023">2023</option>
+                  <option value="2024">2024</option>
+                  <option value="2025">2025</option>
+                  <option value="2026">2026</option>
+                  <option value="2027">2027</option>
+                  <option value="2028">2028</option>
+                  <option value="2029">2029</option>
+                  <option value="2030">2030</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">SSC GPA <span style={{color:'red'}}>*</span></label>
+                <input type="text" name="SSCGPA" value={formData.SSCGPA} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">SSC Grade <span style={{color:'red'}}>*</span></label>
+                <select name="SSCGrade" value={formData.SSCGrade} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md">
+                  <option value="">Select Grade</option>
+                  <option value="A+">A+</option>
+                  <option value="A">A</option>
+                  <option value="A-">A-</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">SSC Roll Number <span style={{color:'red'}}>*</span></label>
+                <input type="text" name="SSCRollNumber" value={formData.SSCRollNumber} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">SSC Registration Number <span style={{color:'red'}}>*</span></label>
+                <input type="text" name="SSCRegistrationNumber" value={formData.SSCRegistrationNumber} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
               </div>
             </div>
-
-            {/* Educational Information - HSC Section */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4" style={{ color: '#0088ce' }}>
-                Educational Information - HSC
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    College Name
-                  </label>
-                  <input
-                    type="text"
-                    name="CollegeName"
-                    value={formData.CollegeName}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    HSC Board
-                  </label>
-                  <select
-                    name="HSCBoard"
-                    value={formData.HSCBoard}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  >
-                    <option value="">Select Board</option>
-                    <option value="Dhaka">Dhaka</option>
-                    <option value="Chittagong">Chittagong</option>
-                    <option value="Khulna">Khulna</option>
-                    <option value="Rajshahi">Rajshahi</option>
-                    <option value="Barisal">Barisal</option>
-                    <option value="Sylhet">Sylhet</option>
-                    <option value="Rangpur">Rangpur</option>
-                    <option value="Mymensingh">Mymensingh</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    HSC Group
-                  </label>
-                  <select
-                    name="HSCGroup"
-                    value={formData.HSCGroup}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  >
-                    <option value="">Select Group</option>
-                    <option value="Science">Science</option>
-                    <option value="Commerce">Commerce</option>
-                    <option value="Arts">Arts</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    HSC Year of Pass
-                  </label>
-                  <select
-                    name="HSCYearPass"
-                    value={formData.HSCYearPass}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  >
-                    <option value="">Select Year</option>
-                    <option value="2020">2020</option>
-                    <option value="2021">2021</option>
-                    <option value="2022">2022</option>
-                    <option value="2023">2023</option>
-                    <option value="2024">2024</option>
-                    <option value="2025">2025</option>
-                    <option value="2026">2026</option>
-                    <option value="2027">2027</option>
-                    <option value="2028">2028</option>
-                    <option value="2029">2029</option>
-                    <option value="2030">2030</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    HSC GPA
-                  </label>
-                  <input
-                    type="text"
-                    name="HSCGPA"
-                    value={formData.HSCGPA}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    HSC Grade
-                  </label>
-                  <select
-                    name="HSCGrade"
-                    value={formData.HSCGrade}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  >
-                    <option value="">Select Grade</option>
-                    <option value="A+">A+</option>
-                    <option value="A">A</option>
-                    <option value="A-">A-</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    HSC Roll Number
-                  </label>
-                  <input
-                    type="text"
-                    name="HSCRollNumber"
-                    value={formData.HSCRollNumber}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    HSC Registration Number
-                  </label>
-                  <input
-                    type="text"
-                    name="HSCRegistrationNumber"
-                    value={formData.HSCRegistrationNumber}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                </div>
+            {/* HSC Information Section */}
+            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: '#0088ce' }}>Educational Information - HSC</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">College Name <span style={{color:'red'}}>*</span></label>
+                <input type="text" name="CollegeName" value={formData.CollegeName} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">HSC Group <span style={{color:'red'}}>*</span></label>
+                <select name="HSCGroup" value={formData.HSCGroup} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md">
+                  <option value="">Select Group</option>
+                  <option value="Science">Science</option>
+                  <option value="Commerce">Commerce</option>
+                  <option value="Arts">Arts</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">HSC Year of Pass <span style={{color:'red'}}>*</span></label>
+                <select name="HSCYearPass" value={formData.HSCYearPass} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md">
+                  <option value="">Select Year</option>
+                  <option value="2020">2020</option>
+                  <option value="2021">2021</option>
+                  <option value="2022">2022</option>
+                  <option value="2023">2023</option>
+                  <option value="2024">2024</option>
+                  <option value="2025">2025</option>
+                  <option value="2026">2026</option>
+                  <option value="2027">2027</option>
+                  <option value="2028">2028</option>
+                  <option value="2029">2029</option>
+                  <option value="2030">2030</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">HSC Roll Number <span style={{color:'red'}}>*</span></label>
+                <input type="text" name="HSCRollNumber" value={formData.HSCRollNumber} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
               </div>
             </div>
-
-            {/* Course Selection Section */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4" style={{ color: '#0088ce' }}>
-                Course Selection
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Selected Course
-                  </label>
-                  <input
-                    type="text"
-                    name="SelectedCourse"
-                    value={formData.SelectedCourse}
-                    onChange={handleChange}
-                    required
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ${
-                      validationErrors.SelectedCourse ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                  <ErrorMessage error={validationErrors.SelectedCourse} />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Branch Name
-                  </label>
-                  <input
-                    type="text"
-                    name="BranchName"
-                    value={formData.BranchName}
-                    onChange={handleChange}
-                    required
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ${
-                      validationErrors.BranchName ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                  <ErrorMessage error={validationErrors.BranchName} />
-                </div>
+            {/* Student Account & Course Selection Section */}
+            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: '#0088ce' }}>Course Selection & Account</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Selected Course <span style={{color:'red'}}>*</span></label>
+                <input type="text" name="SelectedCourse" value={formData.SelectedCourse} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Branch Name <span style={{color:'red'}}>*</span></label>
+                <input type="text" name="BranchName" value={formData.BranchName} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email <span style={{color:'red'}}>*</span></label>
+                <input type="email" name="Email" value={formData.Email} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Password <span style={{color:'red'}}>*</span></label>
+                <input type="password" name="Password" value={formData.Password} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+              </div>
+              <div className="flex items-center mt-2">
+                <input id="terms" name="TermsAccepted" type="checkbox" checked={formData.TermsAccepted} onChange={handleChange} required className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
+                <label htmlFor="terms" className="ml-2 text-gray-700">I accept the <span style={{ color: '#0088ce' }} className="underline cursor-pointer">terms and conditions</span> <span style={{color:'red'}}>*</span></label>
               </div>
             </div>
-
-            {/* Login Credentials Section */}
-            <div>
-              <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: '#0088ce' }}>
-                Login Credentials
-              </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Email Address
-                  </label>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <input
-                      type="email"
-                      name="Email"
-                      value={formData.Email}
-                      onChange={handleChange}
-                      required
-                      className={`flex-1 px-3 py-2 text-sm sm:text-base border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ${
-                        validationErrors.Email ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      style={{ focusRingColor: '#0088ce' }}
-                      disabled={emailVerification.verified}
-                    />
-                    {/* Verify button removed as requested */}
-                    {emailVerification.verified && (
-                      <span className="text-xs sm:text-sm text-green-600 ml-2">Verified</span>
-                    )}
-                  </div>
-                  <ErrorMessage error={validationErrors.Email} />
-                </div>
-
-                <div>
-                  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    name="Password"
-                    value={formData.Password}
-                    onChange={handleChange}
-                    required
-                    autoComplete="new-password"
-                    className={`w-full px-3 py-2 text-sm sm:text-base border rounded-md focus:outline-none focus:ring-2 focus:border-transparent ${
-                      validationErrors.Password ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    style={{ focusRingColor: '#0088ce' }}
-                  />
-                  <ErrorMessage error={validationErrors.Password} />
-                </div>
-              </div>
-            </div>
-
-            {/* Terms and Conditions */}
-            <div className="flex items-start space-x-3">
-              <div className="flex items-center h-5 mt-1">
-                <input
-                  id="terms"
-                  name="TermsAccepted"
-                  type="checkbox"
-                  checked={formData.TermsAccepted}
-                  onChange={handleChange}
-                  className={`h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded ${
-                    validationErrors.TermsAccepted ? 'border-red-500' : ''
-                  }`}
-                />
-              </div>
-              <div className="text-sm sm:text-base">
-                <label htmlFor="terms" className="text-gray-700">
-                  I accept the{' '}
-                  <span style={{ color: '#0088ce' }} className="underline cursor-pointer">
-                    terms and conditions
-                  </span>
-                </label>
-                <ErrorMessage error={validationErrors.TermsAccepted} />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={Object.keys(validateForm()).length > 0}
-              className={`w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ${Object.keys(validateForm()).length > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              Next
-            </button>
+            <button type="submit" className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150">Submit</button>
           </form>
         </div>
       </div>
@@ -1040,6 +506,6 @@ const Admission = () => {
       <ToastContainer />
     </div>
   );
-};
 
+}
 export default Admission;
