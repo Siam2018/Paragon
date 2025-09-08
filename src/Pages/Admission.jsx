@@ -245,7 +245,7 @@ const Admission = () => {
     e.preventDefault();
     // Send verification email
     try {
-      const response = await fetch('/api/send-verification-email', {
+      const response = await fetch('/api/sendVerificationEmail', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.Email })
@@ -496,7 +496,6 @@ const Admission = () => {
                 <input type="text" name="HSCRollNumber" value={formData.HSCRollNumber} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
               </div>
             </div>
-            {/* Student Account & Course Selection Section */}
             <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: '#0088ce' }}>Course Selection & Account</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
