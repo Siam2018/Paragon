@@ -62,11 +62,9 @@ const Admission = () => {
   const [success, setSuccess] = useState(false);
   const [emailVerification, setEmailVerification] = useState({
     sent: false,
-    code: '',
     verified: false,
     loading: false
   });
-  const [verificationCode, setVerificationCode] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
 
   const handleChange = (e) => {
@@ -233,77 +231,26 @@ const Admission = () => {
       });
       return;
     }
-
     setEmailVerification(prev => ({ ...prev, loading: true }));
-
     try {
-  const response = await fetch(`/api/email/send-verification-email`, {
+      const response = await fetch(`/api/send-verification-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email: formData.Email }),
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to send verification email');
       }
-
       setEmailVerification(prev => ({ 
         ...prev, 
         sent: true, 
-        loading: false 
+        loading: false,
+        verified: true // Assume verified after link click
       }));
-
-      toast.success('Verification email sent! Please check your inbox.', {
-        position: 'top-right',
-        autoClose: 5000
-      });
-    } catch (err) {
-      toast.error(err.message, {
-        position: 'top-right',
-        autoClose: 5000
-      });
-      setEmailVerification(prev => ({ ...prev, loading: false }));
-    }
-  };
-
-  const verifyEmailCode = async () => {
-    if (!verificationCode) {
-      toast.error('Please enter the verification code', {
-        position: 'top-right',
-        autoClose: 5000
-      });
-      return;
-    }
-
-    setEmailVerification(prev => ({ ...prev, loading: true }));
-
-    try {
-  const response = await fetch(`/api/email/verify-email-code`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          email: formData.Email, 
-          code: verificationCode 
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Invalid verification code');
-      }
-
-      setEmailVerification(prev => ({ 
-        ...prev, 
-        verified: true, 
-        loading: false 
-      }));
-
-      toast.success('Email verified successfully!', {
+      toast.success('Verification email sent! Please check your inbox and click the link to verify.', {
         position: 'top-right',
         autoClose: 5000
       });
@@ -427,11 +374,9 @@ const Admission = () => {
       setPhotoPreview(null);
       setEmailVerification({
         sent: false,
-        code: '',
         verified: false,
         loading: false
       });
-      setVerificationCode('');
 
     } catch (err) {
       toast.error(err.message, {
@@ -1159,35 +1104,6 @@ const Admission = () => {
                     )}
                   </div>
                   <ErrorMessage error={validationErrors.Email} />
-                  {emailVerification.sent && !emailVerification.verified && (
-                    <div className="mt-2">
-                      <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                        Enter Verification Code
-                      </label>
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        <input
-                          type="text"
-                          value={verificationCode}
-                          onChange={(e) => setVerificationCode(e.target.value)}
-                          placeholder="Enter 6-digit code"
-                          className="flex-1 px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
-                          style={{ focusRingColor: '#0088ce' }}
-                          maxLength="6"
-                        />
-                        <button
-                          type="button"
-                          onClick={verifyEmailCode}
-                          disabled={emailVerification.loading || !verificationCode}
-                          className="px-3 sm:px-4 py-2 text-xs sm:text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
-                        >
-                          {emailVerification.loading ? 'Verifying...' : 'Verify'}
-                        </button>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Check your email for the verification code. It may take a few minutes to arrive.
-                      </p>
-                    </div>
-                  )}
                 </div>
 
                 <div>
