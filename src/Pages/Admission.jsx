@@ -245,7 +245,7 @@ const Admission = () => {
     e.preventDefault();
     // Send verification email
     try {
-      const response = await fetch('/api/sendVerificationEmail', {
+      const response = await fetch('/api/send-verification-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.Email })
@@ -513,7 +513,7 @@ const Admission = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Password <span style={{color:'red'}}>*</span></label>
-                <input type="password" name="Password" value={formData.Password} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md" />
+                <input type="password" name="Password" value={formData.Password} onChange={handleChange} required autoComplete="current-password" className="w-full px-3 py-2 border rounded-md" />
               </div>
               <div className="flex items-center mt-2">
                 <input id="terms" name="TermsAccepted" type="checkbox" checked={formData.TermsAccepted} onChange={handleChange} required className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
