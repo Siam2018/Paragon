@@ -115,8 +115,10 @@ const CoursesSection = () => {
             প্যারাগন কোচিং সেন্টারে রয়েছে বিভিন্ন ধরনের কোর্স যা আপনার শিক্ষাগত লক্ষ্য অর্জনে সহায়তা করবে
           </p>
         </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        {/* Center the cards if there are only 2 courses */}
+        <div
+          className={`grid gap-6 sm:gap-8 ${courses.length === 2 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 justify-center' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}
+        >
           {courses.map((course) => {
             const style = getStyleForCourse(course.Title);
             

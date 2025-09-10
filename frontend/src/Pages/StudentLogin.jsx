@@ -37,16 +37,33 @@ const StudentLogin = () => {
                 body: JSON.stringify(formData),
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Login failed');
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            let data = null;
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                throw new Error(text || 'Unexpected response from server.');
             }
 
-            const data = await response.json();
+            if (!response.ok) {
+                toast.error(data.message || 'Login failed', {
+                    position: 'top-right',
+                    autoClose: 5000
+                });
+                setError(data.message || 'Login failed. Please check your credentials.');
+                setLoading(false);
+                return;
+            }
 
             // Store JWT token and student data in localStorage
-            localStorage.setItem('studentToken', data.token);
-            localStorage.setItem('studentData', JSON.stringify(data.student));
+            if (data.token) {
+                localStorage.setItem('studentToken', data.token);
+            }
+            if (data.student) {
+                localStorage.setItem('studentData', JSON.stringify(data.student));
+            }
             localStorage.setItem('userType', 'student');
 
             toast.success('Login successful!', {
@@ -57,16 +74,15 @@ const StudentLogin = () => {
             // Navigate to home page or dashboard
             setTimeout(() => {
                 navigate('/');
-                // Reload the page to update navbar
                 window.location.reload();
             }, 1500);
 
         } catch (err) {
-            toast.error(err.message, {
+            toast.error(err.message || 'An error occurred. Please try again.', {
                 position: 'top-right',
                 autoClose: 5000
             });
-            setError(err.message);
+            setError(err.message || 'An error occurred. Please try again.');
         } finally {
             setLoading(false);
         }

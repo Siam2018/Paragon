@@ -8,7 +8,6 @@ import CourseRoute from "./routes/courseRoute.js";
 import noticeRoute from "./routes/noticeRoute.js";
 import studentRoute from "./routes/studentRoute.js";
 import emailRoute from "./routes/emailRoute.js";
-import galleryRoute from "./routes/galleryRoute.js";
 import dynamicUpload from "./Middlewares/FileUpload.js"; // This will create directories on import
 import cors from 'cors';
 import path from 'path';
@@ -71,6 +70,3 @@ app.use('/admin', resultRoute);
 app.use('/admin', CourseRoute);
 app.use('/admin', noticeRoute);
 app.use('/admin', studentRoute);
-
-// Gallery routes (public access for viewing, admin for management)
-app.use('/gallery', galleryRoute);

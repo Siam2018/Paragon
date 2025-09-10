@@ -70,15 +70,6 @@ const AdminHome = () => {
       stats: "Academic results"
     },
     {
-      title: "Gallery Management",
-      description: "Manage photo gallery images for the website",
-      icon: "📷",
-      color: "bg-indigo-500",
-      hoverColor: "hover:bg-indigo-600",
-      link: "/GalleryManagement",
-      stats: "Photo gallery"
-    },
-    {
       title: "Publication Management",
       description: "Manage publications, magazines, and documents",
       icon: "📰",
