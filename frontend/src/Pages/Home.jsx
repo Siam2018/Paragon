@@ -26,6 +26,15 @@ const Home = () => {
           <UniversitiesSection />
         </div>
       </div>
+      {/* Admin Login Button above Footer */}
+      <div className='bg-gray-200'>
+        <a
+          href='/AdminSignIn'
+          className='w-full block px-0 py-0 bg-gray-700 text-white rounded-none shadow-none hover:bg-gray-800 transition-colors duration-200 font-semibold text-base text-center'
+        >
+          Admin Login
+        </a>
+      </div>
       <Footer />
     </div>
   )

@@ -158,16 +158,34 @@ const Results = () => {
                   className='w-full border border-gray-300 px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent' 
                   required 
                 />
-                {imageFile && (
-                  <div className='mt-4'>
-                    <p className='text-sm font-medium mb-2'>Image Preview:</p>
-                    <img
-                      src={URL.createObjectURL(imageFile)}
-                      alt='Preview'
-                      className='w-full max-w-xs mx-auto rounded-md border'
-                    />
-                  </div>
-                )}
+                <div className='flex flex-col sm:flex-row gap-4 mt-4'>
+                  {editId && (
+                    <div className='flex-1'>
+                      <p className='text-sm font-medium mb-2'>Old Image:</p>
+                      <img
+                        src={
+                          formData.ImageName && results.find(r => r._id === editId)?.ImageURL
+                            ? results.find(r => r._id === editId).ImageURL.startsWith('http')
+                              ? results.find(r => r._id === editId).ImageURL
+                              : `${BACKEND_URL}/uploads/results/${results.find(r => r._id === editId).ImageURL}`
+                            : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI0MCIgdmlld0JveD0iMCAwIDQwMCAyNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjEyMCIgcj0iNDAiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2ZyB4PSIxODAiIHk9IjEwMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRkZGRkZGIiB2aWV3Qm94PSIwIDAgMjQgMjQiPgo8cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik0xMiAyQTEwIDEwIDAgMCAwIDIgMTJhMTAgMTAgMCAwIDAgMTAgMTBBMTAgMTAgMCAwIDAgMTIgMlptMCAxOGE4IDggMCAxIDEgOC04QTggOCAwIDAgMSAxMiAyMFptMS4zLTEyYTEuMyAxLjMgMCAwIDAtMi42IDBjMCAuNy41IDEuMyAxLjMgMS4zaDFWMTZhMSAxIDAgMCAwIDItMXYtNGMwLS43LS42LTEuMy0xLjMtMS4zWm0wIDEwYTEuMyAxLjMgMCAxIDAgMC0yLjZBMS4zIDEuMyAwIDAgMCAxMy4zIDE4WiIvPgo8L3N2Zz4KPC9zdmc+'
+                        }
+                        alt='Old Preview'
+                        className='w-full max-w-xs mx-auto rounded-md border'
+                      />
+                    </div>
+                  )}
+                  {imageFile && (
+                    <div className='flex-1'>
+                      <p className='text-sm font-medium mb-2'>New Image Preview:</p>
+                      <img
+                        src={URL.createObjectURL(imageFile)}
+                        alt='New Preview'
+                        className='w-full max-w-xs mx-auto rounded-md border'
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
               {formError && <div className='text-red-600 text-sm bg-red-50 p-3 rounded-md'>{formError}</div>}
               <div className='flex flex-col sm:flex-row gap-3 pt-4'>
