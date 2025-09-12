@@ -252,7 +252,7 @@ function Navbar() {
                 onClick={() => navigate('/AdminHome')}
                 className="text-black text-sm xl:text-base whitespace-nowrap px-3 xl:px-4 py-1.5 xl:py-2 border-white border rounded-lg shadow-lg bg-green-300 hover:bg-gradient-to-t from-green-500 to-green-300 transition-all duration-200 hover:scale-105"
               >
-                Admin Home
+                Manage
               </button>
               <button 
                 onClick={handleLogout}
