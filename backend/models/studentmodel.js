@@ -95,6 +95,7 @@ const studentSchema = mongoose.Schema({
         },
         HSCBoard:{
             type: String,
+            required: true,
             enum: ['Dhaka', 'Chittagong', 'Khulna', 'Rajshahi', 'Barisal', 'Sylhet', 'Rangpur', 'Mymensingh']
         },
         HSCGroup:{

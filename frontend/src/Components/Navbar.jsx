@@ -148,7 +148,7 @@ function Navbar() {
 
           {/* Full Menu - spans 6 columns on large screens, positioned left */}
           <ul
-            className={`flex-col lg:flex-row lg:flex lg:items-center lg:justify-start absolute lg:static top-14 sm:top-16 md:top-18 left-0 w-full lg:w-auto lg:bg-transparent transition-all duration-300 ease-in overflow-visible lg:justify-self-start lg:col-span-6 xl:col-span-6 gap-2 sm:gap-3 lg:gap-4 xl:gap-5 shadow-lg lg:shadow-none rounded-b-lg lg:rounded-none ${
+            className={`flex-col lg:flex-row lg:flex lg:items-center lg:justify-start absolute lg:static top-14 sm:top-16 md:top-18 left-0 w-full lg:w-auto lg:bg-transparent transition-all duration-300 ease-in overflow-visible lg:justify-self-start lg:col-span-6 xl:col-span-6 gap-1 sm:gap-2 lg:gap-2 xl:gap-3 shadow-lg lg:shadow-none rounded-b-lg lg:rounded-none ${
               isOpen ? 'flex' : 'hidden'
             }`}
             style={{backgroundColor: isOpen ? 'rgba(0, 136, 206, 0.95)' : 'transparent'}}
@@ -161,7 +161,7 @@ function Navbar() {
             { label: 'রেজাল্ট', path: '/Results' },
             { label: 'পাবলিকেশন্স', path: '/Publications' },
             { label: 'নোটিশ', path: '/Notices' },
-            { label: 'আরো', path: '/More' }
+            { label: 'প্রসপেক্টাস', path: '/More' }
           ].map((item, index) => (
             <li key={index} className="w-full lg:w-auto">
               <Link 

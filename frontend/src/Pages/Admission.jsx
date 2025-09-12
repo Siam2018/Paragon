@@ -528,7 +528,7 @@ const Admission = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Name in Bangla
+                    Name in Bangla <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -546,7 +546,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Name in English
+                    Name in English <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -564,7 +564,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Father's Name (Bangla)
+                    Father's Name (Bangla) <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -582,7 +582,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Mother's Name (Bangla)
+                    Mother's Name (Bangla) <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -600,7 +600,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Date of Birth
+                    Date of Birth <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
@@ -618,7 +618,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Gender
+                    Gender <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="Gender"
@@ -643,7 +643,7 @@ const Admission = () => {
               <div className="flex flex-col lg:flex-row items-start space-y-4 lg:space-y-0 lg:space-x-6">
                 <div className="flex-1 w-full">
                   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
-                    Select Profile Photo
+                    Select Profile Photo <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="file"
@@ -680,7 +680,7 @@ const Admission = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Contact Number
+                    Contact Number <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="tel"
@@ -720,7 +720,7 @@ const Admission = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Present Address
+                    Present Address <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     name="PresentAddress"
@@ -738,7 +738,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Permanent Address
+                    Permanent Address <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     name="PermanentAddress"
@@ -764,7 +764,7 @@ const Admission = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    School Name
+                    School Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -779,7 +779,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    SSC Board
+                    SSC Board <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="SSCBoard"
@@ -803,7 +803,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    SSC Group
+                    SSC Group <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="SSCGroup"
@@ -822,7 +822,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    SSC Year of Pass
+                    SSC Year of Pass <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="SSCYearPass"
@@ -849,7 +849,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    SSC GPA
+                    SSC GPA <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -864,7 +864,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    SSC Grade
+                    SSC Grade <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="SSCGrade"
@@ -886,7 +886,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    SSC Roll Number
+                    SSC Roll Number <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -901,7 +901,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    SSC Registration Number
+                    SSC Registration Number <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -924,7 +924,7 @@ const Admission = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    College Name
+                    College Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -939,12 +939,13 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    HSC Board
+                    HSC Board <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="HSCBoard"
                     value={formData.HSCBoard}
                     onChange={handleChange}
+                    required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
                     style={{ focusRingColor: '#0088ce' }}
                   >
@@ -962,7 +963,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    HSC Group
+                    HSC Group <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="HSCGroup"
@@ -981,7 +982,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    HSC Year of Pass
+                    HSC Year of Pass <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="HSCYearPass"
@@ -1043,7 +1044,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    HSC Roll Number
+                    HSC Roll Number <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -1080,10 +1081,9 @@ const Admission = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Selected Course
+                    Selected Course <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
+                  <select
                     name="SelectedCourse"
                     value={formData.SelectedCourse}
                     onChange={handleChange}
@@ -1092,16 +1092,19 @@ const Admission = () => {
                       validationErrors.SelectedCourse ? 'border-red-500' : 'border-gray-300'
                     }`}
                     style={{ focusRingColor: '#0088ce' }}
-                  />
+                  >
+                    <option value="">Select Course</option>
+                    <option value="B Unit">খ ইউনিট (B Unit)</option>
+                    <option value="C Unit">গ ইউনিট (C Unit)</option>
+                  </select>
                   <ErrorMessage error={validationErrors.SelectedCourse} />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Branch Name
+                    Branch Name <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
+                  <select
                     name="BranchName"
                     value={formData.BranchName}
                     onChange={handleChange}
@@ -1110,7 +1113,9 @@ const Admission = () => {
                       validationErrors.BranchName ? 'border-red-500' : 'border-gray-300'
                     }`}
                     style={{ focusRingColor: '#0088ce' }}
-                  />
+                  >
+                    <option value="Mymensingh">Mymensingh</option>
+                  </select>
                   <ErrorMessage error={validationErrors.BranchName} />
                 </div>
               </div>
@@ -1124,7 +1129,7 @@ const Admission = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Email Address
+                    Email Address <span className="text-red-500">*</span>
                   </label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input
@@ -1192,7 +1197,7 @@ const Admission = () => {
 
                 <div>
                   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
-                    Password
+                    Password <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="password"
@@ -1227,7 +1232,7 @@ const Admission = () => {
               </div>
               <div className="text-sm sm:text-base">
                 <label htmlFor="terms" className="text-gray-700">
-                  I accept the{' '}
+                  I accept the <span className="text-red-500">*</span>{' '}
                   <span style={{ color: '#0088ce' }} className="underline cursor-pointer">
                     terms and conditions
                   </span>

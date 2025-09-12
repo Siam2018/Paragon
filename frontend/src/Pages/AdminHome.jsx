@@ -93,9 +93,9 @@ const AdminHome = () => {
     <div className='min-h-screen bg-gray-50'>
       <Navbar />
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 lg:pt-14">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
-            <div>
+            <div className='pt-8'>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Admin Dashboard</h1>
               {admin && (
                 <p className="text-base sm:text-lg text-gray-600 mt-1">
